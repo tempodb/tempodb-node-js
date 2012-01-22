@@ -30,17 +30,16 @@ exports.TempoDB = function(opts) {
 			connection: opts.secure ? https : http,
 			path: opts.path || '/',
 			headers: headers,
-
 		});
 		return client;
 	}
 
 	var TempoDBClient = function(obj) {
-		obj.call = function(path, callback) {
+		obj.call = function(method, path, callback) {
 			var options = {
 		      host: obj.api_server,
 		      path: path || obj.path,
-		      method: 'GET',
+		      method: method,
 		      headers: obj.headers
 		    };
 
@@ -66,8 +65,35 @@ exports.TempoDB = function(opts) {
 			req.end()
 		}
 
-		obj.range = function(series, start, end, callback) {
-			return obj.call('/series/'+series+'/data/?start='+ISODateString(start)+'&end='+ISODateString(end), callback);
+		obj.range = function(args, callback) {
+			/*
+				required args
+					start (Date)
+					end (Date)
+				must include either
+					series_id (Integer)
+					series_name (String)
+			*/
+			var series_type,
+				series_val;
+
+			if (!(args.start)) throw ID+'missing start date';
+			if (!(args.end)) throw ID+'missing end date';
+
+			if (args.series_id) {
+				series_type = 'id';
+				series_val = args.series_id;
+			}
+			else if (args.series_name) {
+				series_type = 'name';
+				series_val = args.series_name;
+			}
+			else {
+				throw ID+'missing series type';
+			}
+
+			//return obj.call('GET', '/series/'+series_type+'/'+series_val+'/data/?start='+ISODateString(args.start)+'&end='+ISODateString(args.end), callback);
+			return obj.call('GET', '/series/'+series_val+'/data/?start='+ISODateString(args.start)+'&end='+ISODateString(args.end), callback);
 		}
 		
 		return obj;

@@ -5,12 +5,16 @@ var tdb = new tempodb.TempoDB({
 	api_password: 'opensesame'
 });
 
-tick = new Date();
+var args = {
+	series_id: 3,
+	start: new Date('2011-01-13'),
+	end: new Date('2011-01-14')
+}
 
-var start = new Date('2011-01-13');
-var end = new Date('2011-01-14');
+var tick = new Date();
 
-tdb.range(3, start, end, function(result){
-	console.log(result);
-	console.log('done in', new Date() - tick, 'ms');
+tdb.range(args, function(result){
+	var tock = new Date();
+	//console.log(result);
+	console.log('done in', tock - tick, 'ms');
 });
