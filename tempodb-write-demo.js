@@ -1,3 +1,5 @@
+/* http://tempo-db.com/api/write-series/#write-series-by-key */
+
 var tempodb = require('./tempodb');
 
 var tdb = new tempodb.TempoDB({
@@ -11,7 +13,7 @@ var series_key = 'custom-series-key';
 
 var d = new Date('2012-01-01');
 // loop through 10 days, and add 1 data point per minute of that day
-for (var day = 0; day < 10; day++) {
+for (var day = 0; day < 365; day++) {
     data = []
     var tick = new Date();
     // 1440 minutes in one day

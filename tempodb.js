@@ -76,6 +76,9 @@ exports.TempoDB = function(opts) {
 				must include either
 					series_id (Integer)
 					series_key (String)
+				optional args
+					interval (String)
+					function (String)
 			*/
 			var series_type,
 				series_val;
@@ -138,6 +141,10 @@ exports.TempoDB = function(opts) {
 			}
 
 			return obj.call('POST', '/series/'+series_type+'/'+series_val+'/data/', JSON.stringify(args.data), callback);
+		}
+
+		obj.write_bulk = function(data, callback) {
+			return obj.call('POST', '/data/', JSON.stringify(data), callback);	
 		}
 		
 		return obj;
