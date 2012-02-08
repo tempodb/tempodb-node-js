@@ -1,4 +1,4 @@
-var http = require('http');
+var https = require('https');
 var ID = 'TempoDB: ';
 
 exports.TempoDB = function(opts) {
@@ -27,7 +27,7 @@ exports.TempoDB = function(opts) {
 			api_server: api_server,
 			api_key: api_key,
 			api_secret: api_secret,
-			connection: opts.secure ? https : http,
+			connection: https,
 			path: opts.path || '/',
 			headers: headers,
 		});
@@ -68,14 +68,14 @@ exports.TempoDB = function(opts) {
 			req.end()
 		}
 
-		obj.range = function(args, callback) {
+		obj.read = function(args, callback) {
 			/*
 				required args
 					start (Date)
 					end (Date)
 				must include either
 					series_id (Integer)
-					series_name (String)
+					series_key (String)
 			*/
 			var series_type,
 				series_val;
@@ -87,24 +87,37 @@ exports.TempoDB = function(opts) {
 				series_type = 'id';
 				series_val = args.series_id;
 			}
-			else if (args.series_name) {
-				series_type = 'name';
-				series_val = args.series_name;
+			else if (args.series_key) {
+				series_type = 'key';
+				series_val = args.series_key;
 			}
 			else {
 				throw ID+'missing series type';
 			}
 
-			return obj.call('GET', '/series/'+series_type+'/'+series_val+'/data/?start='+ISODateString(args.start)+'&end='+ISODateString(args.end), null, callback);
+			query_string = "?";
+			query_string += 'start='+ISODateString(args.start);
+			query_string += '&end='+ISODateString(args.end);
+
+			if (args.interval) {
+				query_string += '&interval='+args.interval;
+			}
+
+			if (args.function) {
+				query_string += '&function='+args.function;
+			}
+
+
+			return obj.call('GET', '/series/'+series_type+'/'+series_val+'/data/'+query_string, null, callback);
 		}
 
-		obj.add = function(args, callback) {
+		obj.write = function(args, callback) {
 			/*
 				required args
 					data (Array of {t:, v:} objects)
 				must include either
 					series_id (Integer)
-					series_name (String)
+					series_key (String)
 			*/
 
 			var series_type,
@@ -116,9 +129,9 @@ exports.TempoDB = function(opts) {
 				series_type = 'id';
 				series_val = args.series_id;
 			}
-			else if (args.series_name) {
-				series_type = 'name';
-				series_val = args.series_name;
+			else if (args.series_key) {
+				series_type = 'key';
+				series_val = args.series_key;
 			}
 			else {
 				throw ID+'missing series type';
