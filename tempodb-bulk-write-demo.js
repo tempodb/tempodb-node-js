@@ -3,8 +3,8 @@
 var tempodb = require('./tempodb');
 
 var tdb = new tempodb.TempoDB({
-    api_key: 'myagley',
-    api_secret: 'opensesame'
+    api_key: 'your-api-key',
+    api_secret: 'your-api-secret'
 });
 
 var series_key1 = 'custom-series-key1';
