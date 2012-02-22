@@ -3,11 +3,11 @@
 var tempodb = require('./tempodb');
 
 var tdb = new tempodb.TempoDB({
-	api_key: 'your-api-key',
-	api_secret: 'your-api-secret'
+	api_key: 'myagley',
+	api_secret: 'opensesame'
 });
 
-var series_key = 'custom-series-key';
+var series_key = 'inthrma-test1';
 
 
 // read a date range
