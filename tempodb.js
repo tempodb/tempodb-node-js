@@ -39,7 +39,7 @@ exports.TempoDB = function(opts) {
         return client;
     };
 
-	var TempoDBClient = function(obj) {
+    var TempoDBClient = function(obj) {
         obj.call = function(method, path, body, callback) {
             if (body) {
                 obj.headers['Content-Length'] = body.length;
