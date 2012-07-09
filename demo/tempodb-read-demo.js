@@ -3,11 +3,11 @@
 var tempodb = require('../tempodb');
 
 var tdb = new tempodb.TempoDB({
-	api_key: 'myagley',
-	api_secret: 'opensesame'
+    api_key: 'your-api-key',
+    api_secret: 'your-api-secret'
 });
 
-var series_key = 'inthrma-test1';
+var series_key = 'your-custom-key';
 
 
 // read a date range
@@ -16,12 +16,11 @@ var args = {
 	start: new Date('2012-01-01'),
 	end: new Date('2012-01-02'),
 	interval: '1hour',
-	'function': 'min'
+	'function': 'mean'
 }
 
-var tick = new Date();
+var start_time = new Date();
 tdb.read(args, function(result){
-	var tock = new Date();
 	console.log(result);
-	console.log('done in', tock - tick, 'ms');
+	console.log(new Date() - start_time, 'ms');
 });

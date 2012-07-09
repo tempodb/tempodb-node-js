@@ -1,6 +1,6 @@
 /* http://tempo-db.com/api/write-series/#write-series-by-key */
 
-var tempodb = require('./tempodb');
+var tempodb = require('../tempodb');
 
 var tdb = new tempodb.TempoDB({
     api_key: 'your-api-key',
@@ -14,15 +14,14 @@ const MS_IN_MIN = 60000;
 /* update to one of your series_key */
 /* if you write to a key that doesn't yet exist, it will create it for you */
 var series_key = 'your-custom-key';
-var start_date = new Date('2012-01-01');
+var series_start_date = new Date('2012-01-01');
 
 // loop through 10 days, and add 1 data point per minute of that day
 for (var day = 0; day < 365; day++) {
     data = []
-    var start_time = new Date();
 
     for (var min = 0; min < MINUTES_IN_DAY; min++) {
-        data.push({t:new Date(start_date.getTime() + min * MS_IN_MIN), v:Math.random()*50})
+        data.push({t:new Date(series_start_date.getTime() + min * MS_IN_MIN), v:Math.random()*50})
     }
 
     var add_args = {
@@ -31,11 +30,13 @@ for (var day = 0; day < 365; day++) {
     }
 
     console.log(day, data[0]);
-    
+    var start_time = new Date();
+
     tdb.write(add_args, function(result){
-        console.log(new Date()-start_time);
+        /* write out request length in ms */
+        console.log(new Date()-start_time, 'ms');
     });
 
     //bump by 1 day
-    start_date.setTime(start_date.getTime() + MS_IN_DAY);
+    series_start_date.setTime(series_start_date.getTime() + MS_IN_DAY);
 }
