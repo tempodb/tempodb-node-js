@@ -15,14 +15,14 @@ exports.TempoDB = function(opts) {
     var ID = 'TempoDB: ';
 
     var createTempoDBClient = function(opts){
-        /* make sure that user and password are provided */
+        /* make sure that key and secret are provided */
         var api_key,
             api_secret;
 
         if (!(api_key = opts.api_key))
-            throw ID + 'missing API user';
+            throw ID + 'missing API key';
         if (!(api_secret = opts.api_secret))
-            throw ID + 'missing API password';
+            throw ID + 'missing API secret';
 
         var api_server = opts.api_server || 'api.tempo-db.com';
         var auth = 'Basic ' + new Buffer(api_key+':'+api_secret).toString('base64');
