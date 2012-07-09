@@ -1,6 +1,6 @@
 /* http://tempo-db.com/api/read-series/#read-series-by-key */
 
-var tempodb = require('../tempodb');
+var tempodb = require('tempodb');
 
 var tdb = new tempodb.TempoDB({
     api_key: 'your-api-key',
