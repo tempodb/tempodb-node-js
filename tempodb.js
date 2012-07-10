@@ -14,7 +14,7 @@ exports.TempoDB = function(opts) {
 
     var ID = 'TempoDB: ';
 
-    var createTempoDBClient = function(opts){
+    var Client = function(opts){
         /* make sure that key and secret are provided */
         var api_key,
             api_secret;
@@ -28,137 +28,135 @@ exports.TempoDB = function(opts) {
         var auth = 'Basic ' + new Buffer(api_key+':'+api_secret).toString('base64');
         var headers = {'Host': api_server, 'Authorization': auth};
 
-        var client = TempoDBClient({
-            api_server: api_server,
-            api_key: api_key,
-            api_secret: api_secret,
-            connection: https,
-            path: opts.path || '/',
-            headers: headers
-        });
-        return client;
+        this.api_server = api_server;
+        this.api_key = api_key;
+        this.api_secret = api_secret;
+        this.connection = https;
+        this.path = opts.path || '/';
+        this.headers = headers;
     };
 
-    var TempoDBClient = function(obj) {
-        obj.call = function(method, path, body, callback) {
-            if (body) {
-                obj.headers['Content-Length'] = body.length;
-            }
+    Client.prototype.call = function(method, path, body, callback) {
+        if (body) {
+            this.headers['Content-Length'] = body.length;
+        }
 
-            var options = {
-                host: obj.api_server,
-                path: '/v1'+path || obj.path,
-                method: method,
-                headers: obj.headers
-            };
+        var options = {
+            host: this.api_server,
+            path: '/v1'+path || this.path,
+            method: method,
+            headers: this.headers
+        };
 
-            var req = obj.connection.request(options, function (res) {
-                var data = '';
+        var req = this.connection.request(options, function (res) {
+            var data = '';
 
-                //the listener that handles the response chunks
-                res.addListener('data', function (chunk) {
-                    data += chunk.toString();
-				});
+            //the listener that handles the response chunks
+            res.addListener('data', function (chunk) {
+                data += chunk.toString();
+			});
 
-                res.addListener('end', function() {
-                    result = '';
-                    if (data) {
-                        result = JSON.parse(data);
-                    }
-                    callback(result);
-                });
+            res.addListener('end', function() {
+                result = '';
+                response = res.statusCode;
+                if (data) {
+                    result = JSON.parse(data);
+                }
+                callback({
+                            response: response,
+                            body: result
+                        });
             });
+        });
 
-            if (body) {
-                req.write(body);
-            }
-            req.end();
-        };
+        if (body) {
+            req.write(body);
+        }
+        req.end();
+    }
 
-        obj.read = function(args, callback) {
-            /*
-                required args
-                    start (Date)
-                    end (Date)
-                must include either
-                    series_id (Integer)
-                    series_key (String)
-                optional args
-                    interval (String)
-                    function (String)
-            */
-            var series_type,
-                series_val;
+    Client.prototype.read = function(args, callback) {
+        /*
+            required args
+                start (Date)
+                end (Date)
+            must include either
+                series_id (Integer)
+                series_key (String)
+            optional args
+                interval (String)
+                function (String)
+        */
+        var series_type,
+            series_val;
 
-            if (!(args.start))
-                throw ID + 'missing start date';
+        if (!(args.start))
+            throw ID + 'missing start date';
 
-            if (!(args.end))
-                throw ID + 'missing end date';
+        if (!(args.end))
+            throw ID + 'missing end date';
 
-            if (args.series_id) {
-                series_type = 'id';
-                series_val = args.series_id;
-            }
-            else if (args.series_key) {
-                series_type = 'key';
-                series_val = args.series_key;
-            }
-            else {
-                throw ID + 'missing series type';
-            }
+        if (args.series_id) {
+            series_type = 'id';
+            series_val = args.series_id;
+        }
+        else if (args.series_key) {
+            series_type = 'key';
+            series_val = args.series_key;
+        }
+        else {
+            throw ID + 'missing series type';
+        }
 
-            query_string = "?";
-            query_string += 'start=' + ISODateString(args.start);
-            query_string += '&end=' + ISODateString(args.end);
+        query_string = "?";
+        query_string += 'start=' + ISODateString(args.start);
+        query_string += '&end=' + ISODateString(args.end);
 
-            if (args.interval) {
-                query_string += '&interval=' + args.interval;
-            }
+        if (args.interval) {
+            query_string += '&interval=' + args.interval;
+        }
 
-            if (args['function']) {
-                query_string += '&function=' + args['function'];
-            }
+        if (args['function']) {
+            query_string += '&function=' + args['function'];
+        }
 
-            return obj.call('GET', '/series/' + series_type + '/' + series_val + '/data/' + query_string, null, callback);
-        };
-
-        obj.write = function(args, callback) {
-            /*
-                required args
-                    data (Array of {t:, v:} objects)
-                must include either
-                    series_id (Integer)
-                    series_key (String)
-            */
-
-            var series_type,
-                series_val;
-
-            if (!(args.data))
-                throw ID + 'missing data';
-
-            if (args.series_id) {
-                series_type = 'id';
-                series_val = args.series_id;
-            }
-            else if (args.series_key) {
-                series_type = 'key';
-                series_val = args.series_key;
-            }
-            else {
-                throw ID + 'missing series type';
-            }
-
-            return obj.call('POST', '/series/' + series_type + '/' + series_val + '/data/', JSON.stringify(args.data), callback);
-        };
-
-        obj.write_bulk = function(data, callback) {
-            return obj.call('POST', '/data/', JSON.stringify(data), callback);
-        };
-
-        return obj;
+        return this.call('GET', '/series/' + series_type + '/' + series_val + '/data/' + query_string, null, callback);
     };
+
+    Client.prototype.write = function(args, callback) {
+        /*
+            required args
+                data (Array of {t:, v:} objects)
+            must include either
+                series_id (Integer)
+                series_key (String)
+        */
+
+        var series_type,
+            series_val;
+
+        if (!(args.data))
+            throw ID + 'missing data';
+
+        if (args.series_id) {
+            series_type = 'id';
+            series_val = args.series_id;
+        }
+        else if (args.series_key) {
+            series_type = 'key';
+            series_val = args.series_key;
+        }
+        else {
+            throw ID + 'missing series type';
+        }
+
+        return this.call('POST', '/series/' + series_type + '/' + series_val + '/data/', JSON.stringify(args.data), callback);
+    };
+
+    Client.prototype.write_bulk = function(data, callback) {
+        return this.call('POST', '/data/', JSON.stringify(data), callback);
+    };
+
 
     var ISODateString = function(d) {
         function pad(n) {
@@ -173,5 +171,6 @@ exports.TempoDB = function(opts) {
             pad(d.getUTCSeconds()) + 'Z';
     };
 
-    return createTempoDBClient(opts);
+
+    return new Client(opts);
 };
