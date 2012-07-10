@@ -25,6 +25,10 @@ var data = {
 var start_time = new Date();
 
 tdb.write_bulk(data, function(result){
-    /* write out request length in ms */
-    console.log(new Date()-start_time, 'ms');
+    var out = result.response;
+    if (result.response != 200 && result.body) {
+        out += ': ' + result.body;
+    }
+    console.log(out+'\n');
+    console.log('Completed in', new Date() - start_time, 'ms\n');
 });

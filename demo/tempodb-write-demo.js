@@ -1,6 +1,6 @@
 /* http://tempo-db.com/api/write-series/#write-series-by-key */
 
-var tempodb = require('tempodb');
+var tempodb = require('../tempodb');
 
 var tdb = new tempodb.TempoDB({
     api_key: 'your-api-key',
@@ -17,7 +17,7 @@ var series_key = 'your-custom-key';
 var series_start_date = new Date('2012-01-01');
 
 // loop through 10 days, and add 1 data point per minute of that day
-for (var day = 0; day < 365; day++) {
+for (var day = 0; day < 10; day++) {
     data = []
 
     for (var min = 0; min < MINUTES_IN_DAY; min++) {
@@ -30,11 +30,13 @@ for (var day = 0; day < 365; day++) {
     }
 
     console.log(day, data[0]);
-    var start_time = new Date();
 
     tdb.write(add_args, function(result){
-        /* write out request length in ms */
-        console.log(new Date()-start_time, 'ms');
+        var out = result.response;
+        if (result.response != 200 && result.body) {
+            out += ': ' + result.body;
+        }
+        console.log(out+'\n');
     });
 
     //bump by 1 day

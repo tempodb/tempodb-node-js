@@ -21,6 +21,6 @@ var args = {
 
 var start_time = new Date();
 tdb.read(args, function(result){
-	console.log(result);
-	console.log(new Date() - start_time, 'ms');
+	console.log(result.response + ': ' + result.body);
+	console.log('Completed in', new Date() - start_time, 'ms\n');
 });
