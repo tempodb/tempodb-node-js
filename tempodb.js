@@ -1,38 +1,42 @@
+var http = require('http');
 var https = require('https');
 
 exports.TempoDB = function(opts) {
     /*
         required opts
-            api_key (String)
-            api_secret (String)
+            key (String)
+            secret (String)
 
         optional opts
-            api_server (String)
-            path (String)
-            connection (Boolean)
+            hostname (String)
+            port (Integer)
+            secure (Boolean)
+            version (String)
     */
 
     var ID = 'TempoDB: ';
 
     var Client = function(opts){
         /* make sure that key and secret are provided */
-        var api_key,
-            api_secret;
+        var key,
+            secret;
 
-        if (!(api_key = opts.api_key))
+        if (!(key = opts.key))
             throw ID + 'missing API key';
-        if (!(api_secret = opts.api_secret))
+        if (!(secret = opts.secret))
             throw ID + 'missing API secret';
 
-        var api_server = opts.api_server || 'api.tempo-db.com';
-        var auth = 'Basic ' + new Buffer(api_key+':'+api_secret).toString('base64');
-        var headers = {'Host': api_server, 'Authorization': auth};
+        var hostname = opts.hostname || 'api.tempo-db.com';
+        var auth = 'Basic ' + new Buffer(key+':'+secret).toString('base64');
+        var headers = {'Host': hostname, 'Authorization': auth};
 
-        this.api_server = api_server;
-        this.api_key = api_key;
-        this.api_secret = api_secret;
-        this.connection = https;
-        this.path = opts.path || '/';
+        this.key = key;
+        this.secret = secret;
+        this.hostname = hostname;
+        this.port = opts.port || 443;
+        this.connection = opts.secure || true ? https : http;
+        this.version = opts.version || 'v1';
+        this.path = '/' + this.version;
         this.headers = headers;
     };
 
@@ -42,8 +46,9 @@ exports.TempoDB = function(opts) {
         }
 
         var options = {
-            host: this.api_server,
-            path: '/v1'+path || this.path,
+            host: this.hostname,
+            port: this.port,
+            path: this.path+path || this.path,
             method: method,
             headers: this.headers
         };

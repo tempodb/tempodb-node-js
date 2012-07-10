@@ -30,4 +30,16 @@ node tempodb-read-demo
 
 # Classes
 
-## 
+## Client(opts)
+Stores the session information for authenticating and accessing TempoDB. The argument ``opts`` is an object which contains required and optional properties.  Your key and secret are required.  The Client allows you to specify hostname, port, protocol (http or https), and version. This is used if you are on a private cluster.
+The default hostname and port should work for the standard cluster.
+
+### Required opts
+* key (String)
+* secret (String)
+
+### Optional opts
+* *hostname* (String) default: 'api.tempo-db.com'
+* *port* (Integer) default: 443
+* *secure* (Boolean) default: true
+* *version* (String) default: 'v1'
