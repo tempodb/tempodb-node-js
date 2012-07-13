@@ -1,7 +1,7 @@
 /* http://tempo-db.com/api/write-series/#write-series-by-key */
 
 var TempoDBClient = require('tempodb').TempoDBClient;
-var tempodb = new TempoDBClient('your-api-key', 'your-api-secret')
+var tempodb = new TempoDBClient('your-api-key', 'your-api-secret');
 
 const MINUTES_IN_DAY = 1440;
 const MS_IN_DAY = 86400000;

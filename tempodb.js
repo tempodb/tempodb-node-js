@@ -6,10 +6,10 @@ var TempoDBClient = exports.TempoDBClient =
     function(key, secret, options) {
         /*
             options
-                hostname (String)
+                hostname (string)
                 port (Integer)
                 secure (Boolean)
-                version (String)
+                version (string)
         */
         options = options || {};
         
@@ -83,9 +83,9 @@ TempoDBClient.prototype.call = function(method, path, body, callback) {
 TempoDBClient.prototype.get_series = function(options, callback) {
     /*
         options
-            ids (Array of ids or single id)
-            keys (Array of keys or single key)
-            tags (String or Array[String])
+            id (Array of ids or single id)
+            key (Array of keys or single key)
+            tag (string or Array[string])
             attr ({key: val, key2: val2})
 
     */
@@ -128,8 +128,8 @@ TempoDBClient.prototype.update_series = function(series_id, series_key, name, at
 TempoDBClient.prototype.update_series_key = function(series_key, options, callback) {
     /*
         options
-            name (String)
-            tags (String or Array[String])
+            name (string)
+            tags (string or Array[string])
             attr ({key: val, key2: val2})
 
     */
@@ -141,8 +141,8 @@ TempoDBClient.prototype.read = function(start, end, options, callback) {
         options
             ids (Array of ids or single id)
             keys (Array of keys or single key)
-            interval (String)
-            function (String)
+            interval (string)
+            function (string)
 
     */
     options = options || {};
@@ -156,8 +156,8 @@ TempoDBClient.prototype.read = function(start, end, options, callback) {
 TempoDBClient.prototype.read_id = function(series_id, start, end, options, callback) {
     /*
         options
-            interval (String)
-            function (String)
+            interval (string)
+            function (string)
 
     */
     options = options || {};
@@ -171,8 +171,8 @@ TempoDBClient.prototype.read_id = function(series_id, start, end, options, callb
 TempoDBClient.prototype.read_key = function(series_key, start, end, options, callback) {
     /*
         options
-            interval (String)
-            function (String)
+            interval (string)
+            function (string)
 
     */
     options = options || {};
