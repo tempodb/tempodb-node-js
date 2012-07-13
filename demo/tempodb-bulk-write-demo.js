@@ -1,11 +1,7 @@
 /* http://tempo-db.com/api/write-series/#bulk-write-multiple-series */
 
-var tempodb = require('tempodb');
-
-var tdb = new tempodb.TempoDB({
-    api_key: 'your-api-key',
-    api_secret: 'your-api-secret'
-});
+var TempoDBClient = require('tempodb').TempoDBClient;
+var tempodb = new TempoDBClient('your-api-key', 'your-api-secret')
 
 var series_key1 = 'custom-series-key1';
 var series_key2 = 'custom-series-key2';
@@ -24,10 +20,10 @@ var data = {
 
 var start_time = new Date();
 
-tdb.write_bulk(data, function(result){
+tempodb.write_bulk(data, function(result){
     var out = result.response;
-    if (result.response != 200 && result.body) {
-        out += ': ' + result.body;
+    if (result.body) {
+        out += ': ' + JSON.stringify(result.body);
     }
     console.log(out+'\n');
     console.log('Completed in', new Date() - start_time, 'ms\n');

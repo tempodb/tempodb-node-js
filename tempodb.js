@@ -1,181 +1,255 @@
 var http = require('http');
 var https = require('https');
+var ID = 'TempoDB: ';
 
-exports.TempoDB = function(opts) {
-    /*
-        required opts
-            key (String)
-            secret (String)
+var TempoDBClient = exports.TempoDBClient = 
+    function(key, secret, options) {
+        /*
+            options
+                hostname (String)
+                port (Integer)
+                secure (Boolean)
+                version (String)
+        */
+        options = options || {};
+        
+        const HOST = 'api.tempo-db.com',
+              PORT = 443,
+              VERSION = 'v1',
+              SECURE = true;
 
-        optional opts
-            hostname (String)
-            port (Integer)
-            secure (Boolean)
-            version (String)
-    */
-
-    var ID = 'TempoDB: ';
-
-    var Client = function(opts){
-        /* make sure that key and secret are provided */
-        var key,
-            secret;
-
-        if (!(key = opts.key))
-            throw ID + 'missing API key';
-        if (!(secret = opts.secret))
-            throw ID + 'missing API secret';
-
-        var hostname = opts.hostname || 'api.tempo-db.com';
+        var hostname = options.hostname || HOST;
         var auth = 'Basic ' + new Buffer(key+':'+secret).toString('base64');
         var headers = {'Host': hostname, 'Authorization': auth};
 
         this.key = key;
         this.secret = secret;
         this.hostname = hostname;
-        this.port = opts.port || 443;
-        this.connection = opts.secure || true ? https : http;
-        this.version = opts.version || 'v1';
+        this.port = options.port || PORT;
+        this.connection = options.secure || SECURE ? https : http;
+        this.version = options.version || VERSION;
         this.path = '/' + this.version;
         this.headers = headers;
-    };
-
-    Client.prototype.call = function(method, path, body, callback) {
-        if (body) {
-            this.headers['Content-Length'] = body.length;
-        }
-
-        var options = {
-            host: this.hostname,
-            port: this.port,
-            path: this.path+path || this.path,
-            method: method,
-            headers: this.headers
-        };
-
-        var req = this.connection.request(options, function (res) {
-            var data = '';
-
-            //the listener that handles the response chunks
-            res.addListener('data', function (chunk) {
-                data += chunk.toString();
-			});
-
-            res.addListener('end', function() {
-                result = '';
-                response = res.statusCode;
-                if (data) {
-                    result = JSON.parse(data);
-                }
-                callback({
-                            response: response,
-                            body: result
-                        });
-            });
-        });
-
-        if (body) {
-            req.write(body);
-        }
-        req.end();
     }
 
-    Client.prototype.read = function(args, callback) {
-        /*
-            required args
-                start (Date)
-                end (Date)
-            must include either
-                series_id (Integer)
-                series_key (String)
-            optional args
-                interval (String)
-                function (String)
-        */
-        var series_type,
-            series_val;
+TempoDBClient.prototype.call = function(method, path, body, callback) {
+    var json_body = '';
+    if (body) {
+        json_body = JSON.stringify(body);
+        this.headers['Content-Length'] = json_body.length;
+    }
 
-        if (!(args.start))
-            throw ID + 'missing start date';
+    console.log(path);
+    console.log(json_body);
 
-        if (!(args.end))
-            throw ID + 'missing end date';
+    var options = {
+        host: this.hostname,
+        port: this.port,
+        path: this.path+path || this.path,
+        method: method,
+        headers: this.headers
+    };
 
-        if (args.series_id) {
-            series_type = 'id';
-            series_val = args.series_id;
+    var req = this.connection.request(options, function (res) {
+        var data = '';
+
+        //the listener that handles the response chunks
+        res.addListener('data', function (chunk) {
+            data += chunk.toString();
+		});
+
+        res.addListener('end', function() {
+            result = '';
+            response = res.statusCode;
+            if (data) {
+                result = JSON.parse(data);
+            }
+
+            if (typeof callback != 'undefined') {
+                callback({
+                    response: response,
+                    body: result
+                });
+            }
+        });
+    });
+
+    if (body) {
+        req.write(json_body);
+    }
+    req.end();
+}
+
+TempoDBClient.prototype.get_series = function(options, callback) {
+    /*
+        options
+            ids (Array of ids or single id)
+            keys (Array of keys or single key)
+            tags (String or Array[String])
+            attr ({key: val, key2: val2})
+
+    */
+    options = options || {};
+    query_string = '?' + EncodeQueryData(options);
+    
+    return this.call('GET', '/series/' + query_string, null, callback);
+}
+
+TempoDBClient.prototype.create_series = function(key, callback) {
+    data = {};
+
+    if (typeof key == 'string' && key) {
+        data.key = key;
+    }
+
+    return this.call('POST', '/series/', data, callback);
+}
+
+TempoDBClient.prototype.update_series = function(series_id, series_key, name, attributes, tags, callback) {
+    if (!(tags instanceof Array)) {
+        throw ID + 'tags must be an array';
+    }
+
+    if (!(attributes instanceof Object)) {
+        throw ID + 'attributes must be an Object';
+    }
+
+    data = {
+        id: series_id,
+        key: series_key,
+        name: name,
+        attributes: attributes,
+        tags: tags
+    }
+
+    return this.call('PUT', '/series/id/' + series_id + '/', data, callback);
+}
+
+TempoDBClient.prototype.update_series_key = function(series_key, options, callback) {
+    /*
+        options
+            name (String)
+            tags (String or Array[String])
+            attr ({key: val, key2: val2})
+
+    */
+    return this.call('PUT', '/series/key/' + series_key + '/', options, callback);   
+}
+
+TempoDBClient.prototype.read = function(start, end, options, callback) {
+    /*
+        options
+            ids (Array of ids or single id)
+            keys (Array of keys or single key)
+            interval (String)
+            function (String)
+
+    */
+    options = options || {};
+    options.start = ISODateString(start);
+    options.end = ISODateString(end);
+    query_string = '?' + EncodeQueryData(options);
+
+    return this.call('GET', '/data/' + query_string, null, callback);
+};
+
+TempoDBClient.prototype.read_id = function(series_id, start, end, options, callback) {
+    /*
+        options
+            interval (String)
+            function (String)
+
+    */
+    options = options || {};
+    options.start = ISODateString(start);
+    options.end = ISODateString(end);
+    query_string = '?' + EncodeQueryData(options);
+
+    return this.call('GET', '/series/id/' + series_id + '/data/' + query_string, null, callback);
+}
+
+TempoDBClient.prototype.read_key = function(series_key, start, end, options, callback) {
+    /*
+        options
+            interval (String)
+            function (String)
+
+    */
+    options = options || {};
+    options.start = ISODateString(start);
+    options.end = ISODateString(end);
+    query_string = '?' + EncodeQueryData(options);
+
+    return this.call('GET', '/series/key/' + series_key + '/data/' + query_string, null, callback);
+}
+
+TempoDBClient.prototype.write_id = function(series_id, data, callback) {
+    return this.call('POST', '/series/id/' + series_id + '/data/', data, callback);
+}
+
+TempoDBClient.prototype.write_key = function(series_key, data, callback) {
+    return this.call('POST', '/series/key/' + series_key + '/data/', data, callback);
+}
+
+TempoDBClient.prototype.write_bulk = function(ts, data, callback) {
+    var body = {
+        ts: ISODateString(ts),
+        data: data
+    }
+
+    return this.call('POST', '/data/', body, callback);
+}
+
+TempoDBClient.prototype.increment_id = function(series_id, data, callback) {
+    return this.call('POST', '/series/id/' + series_id + '/increment/', data, callback);
+}
+
+TempoDBClient.prototype.increment_key = function(series_key, data, callback) {
+    return this.call('POST', '/series/key/' + series_key + '/increment/', data, callback);
+}
+
+TempoDBClient.prototype.increment_bulk = function(ts, data, callback) {
+    var body = {
+        ts: ISODateString(ts),
+        data: data
+    }
+
+    return this.call('POST', '/increment/', body, callback);
+}
+
+var EncodeQueryData = function(data) {
+   var ret = [];
+   for (var key in data) {
+        var value = data[key];
+
+        if (value instanceof Array) {
+            for (var v in value){
+                ret.push(encodeURIComponent(key) + "=" + encodeURIComponent(value[v]));
+            }
         }
-        else if (args.series_key) {
-            series_type = 'key';
-            series_val = args.series_key;
+        else if (value instanceof Object) {
+            for (var v in value){
+                ret.push(encodeURIComponent(key) + "[" + encodeURIComponent(v) + "]=" + encodeURIComponent(value[v]));
+            }
         }
         else {
-            throw ID + 'missing series type';
+            // plain value
+            ret.push(encodeURIComponent(key) + "=" + encodeURIComponent(value));
         }
+    }
 
-        query_string = "?";
-        query_string += 'start=' + ISODateString(args.start);
-        query_string += '&end=' + ISODateString(args.end);
+   return ret.join("&");
+}
 
-        if (args.interval) {
-            query_string += '&interval=' + args.interval;
-        }
+var ISODateString = function(d) {
+    function pad(n) {
+        return n<10 ? '0' + n : n;
+    }
 
-        if (args['function']) {
-            query_string += '&function=' + args['function'];
-        }
-
-        return this.call('GET', '/series/' + series_type + '/' + series_val + '/data/' + query_string, null, callback);
-    };
-
-    Client.prototype.write = function(args, callback) {
-        /*
-            required args
-                data (Array of {t:, v:} objects)
-            must include either
-                series_id (Integer)
-                series_key (String)
-        */
-
-        var series_type,
-            series_val;
-
-        if (!(args.data))
-            throw ID + 'missing data';
-
-        if (args.series_id) {
-            series_type = 'id';
-            series_val = args.series_id;
-        }
-        else if (args.series_key) {
-            series_type = 'key';
-            series_val = args.series_key;
-        }
-        else {
-            throw ID + 'missing series type';
-        }
-
-        return this.call('POST', '/series/' + series_type + '/' + series_val + '/data/', JSON.stringify(args.data), callback);
-    };
-
-    Client.prototype.write_bulk = function(data, callback) {
-        return this.call('POST', '/data/', JSON.stringify(data), callback);
-    };
-
-
-    var ISODateString = function(d) {
-        function pad(n) {
-            return n<10 ? '0' + n : n;
-        }
-
-        return d.getUTCFullYear() + '-' +
-            pad(d.getUTCMonth() + 1) + '-' +
-            pad(d.getUTCDate()) + 'T' +
-            pad(d.getUTCHours()) + ':' +
-            pad(d.getUTCMinutes()) + ':' +
-            pad(d.getUTCSeconds()) + 'Z';
-    };
-
-
-    return new Client(opts);
+    return d.getUTCFullYear() + '-' +
+        pad(d.getUTCMonth() + 1) + '-' +
+        pad(d.getUTCDate()) + 'T' +
+        pad(d.getUTCHours()) + ':' +
+        pad(d.getUTCMinutes()) + ':' +
+        pad(d.getUTCSeconds()) + 'Z';
 };
