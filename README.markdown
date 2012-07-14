@@ -51,7 +51,7 @@ You can specify an optional third argument Object to TempoDBClient
 
 # API
 
-## TempoDBClient#create_series(*key*)
+## TempoDBClient#create_series(*key*, *callback*)
 Creates a new series with an optionally specified key.  If no key is given, only the system generated id is returned.
 
 ### Parameters
@@ -81,17 +81,19 @@ The following example creates two series, one with a given key of "my-custom-key
     var series2 = tempodb.create_series(null, cb);
 
 
-## TempoDBClient#get_series(*options*)
+## TempoDBClient#get_series(*options*, *callback*)
 Gets a list of series objects, optionally filtered by the provided parameters. Series can be filtered by id, key, tag and
 attribute.
 
 ### Parameters
 
 * options is an object containing any of the following
-    * ids - an array of ids to include (array of strings)
-    * keys - an array of keys to include (array of strings)
-    * tags - an array of tags to filter on. These tags are and'd together (array of strings)
-    * attributes - an object of key/value pairs to filter on. These attributes are and'd together. (object)
+    * id - an array of ids to include (array of strings)
+        * can also pass single string if only one id
+    * key - an array of keys to include (array of strings)
+        * can also pass single string if only one key
+    * tag - an array of tags to filter on. These tags are and'd together (array of strings)
+    * attr - an object of attribute key/value pairs to filter on. These attributes are and'd together. (object)
 
 ### Returns
 An array of series objects
@@ -127,4 +129,92 @@ The following example returns all series with tags "tag1" and "tag2" and attribu
     }
 
     var series = tempodb.get_series(options, cb);
+
+
+## TempoDBClient#update_series(*series_id*, *series_key*, *name*, *attributes*, *tags*, *callback*)
+Updates a series.  Currently, only tags and attributes can be modified. The easiest way to use this method is through a read-modify-write cycle.
+
+### Parameters
+
+* series_id - id for the series (string)
+* series_key - key for the series (string)
+* name - name of the series (string)
+* attributes - an object of attribute key/value pairs (object)
+* tags - an array of tags (array of strings)
+
+### Returns
+The updated series object
+
+    { 
+     "id":"92a81e6936c24274b6bb53c57004afce",
+     "key":"test1",
+     "name":"",
+     "attributes":{unit: 'Fahrenheit', user_id: 27},
+     "tags":['foo', 'bar']
+    }
+
+### Example
+
+The following example reads the list of series with key *test1* (should only be one) and replaces the tags and attributes.
+
+    var TempoDBClient = require('tempodb').TempoDBClient;
+    var tempodb = new TempoDBClient('your-api-key', 'your-api-secret');
+    var cb = function(result){ console.log(result.response+': '+ JSON.stringify(result.body)); }
+
+    var options = {
+        key: 'test1'
+    }
+
+    var series = tempodb.get_series(options, function(result) {
+        var series = result.body[0];
+        var new_tags = ['foo', 'bar'];
+        var new_attr = {unit: 'Fahrenheit', user_id: 27};
+        var updated_series = tempodb.update_series(series.id, series.key, series.name, new_tags, new_attr, cb);
+    });
+
+
+## TempoDBClient#read(*start*, *end*, *options*, *callback*)
+Gets an array of arrays of data point objects for the specified start/end times. The optional interval parameter allows you to specify a rollup period. For example, "1hour" will roll the data up on the hour using the provided function. The function parameter specifies the folding function to use while rolling the data up. A rollup is selected automatically if no interval or function is given. The auto rollup interval is calculated by the total time range (end - start) as follows:
+
+* range <= 2 days - raw data is returned
+* range <= 30 days - data is rolled up on the hour
+* else - data is rolled up by the day
+
+Rollup intervals are specified by a number and a time period. For example, 1day or 5min. Supported time periods:
+* min
+* hour
+* day
+* month
+* year
+
+Supported rollup functions:
+* sum
+* max
+* min
+* avg or mean
+* stddev (standard deviation)
+* count
+
+You can also retrieve raw data by specifying "raw" as the interval. The series to query can be filtered using the remaining parameters.
+
+### Parameters
+
+* start - start time for the query (Date)
+* end - end time for the query (Date)
+
+* options is an object containing any of the following
+    * interval - the rollup interval (string)
+    * function - the rollup folding function (string)
+    * id - an array of ids to include (array of strings)
+        * can also pass single string if only one id
+    * key - an array of keys to include (array of strings)
+        * can also pass single string if only one key
+    * tag - an array of tags to filter on. These tags are and'd together (array of strings)
+    * attr - an object of attribute key/value pairs to filter on. These attributes are and'd together. (object)
+
+
+
+### Returns
+
+A list of DataSets
 

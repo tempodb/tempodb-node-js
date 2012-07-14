@@ -80,6 +80,16 @@ TempoDBClient.prototype.call = function(method, path, body, callback) {
     req.end();
 }
 
+TempoDBClient.prototype.create_series = function(key, callback) {
+    data = {};
+
+    if (typeof key == 'string' && key) {
+        data.key = key;
+    }
+
+    return this.call('POST', '/series/', data, callback);
+}
+
 TempoDBClient.prototype.get_series = function(options, callback) {
     /*
         options
@@ -93,16 +103,6 @@ TempoDBClient.prototype.get_series = function(options, callback) {
     query_string = '?' + EncodeQueryData(options);
     
     return this.call('GET', '/series/' + query_string, null, callback);
-}
-
-TempoDBClient.prototype.create_series = function(key, callback) {
-    data = {};
-
-    if (typeof key == 'string' && key) {
-        data.key = key;
-    }
-
-    return this.call('POST', '/series/', data, callback);
 }
 
 TempoDBClient.prototype.update_series = function(series_id, series_key, name, attributes, tags, callback) {
@@ -125,22 +125,11 @@ TempoDBClient.prototype.update_series = function(series_id, series_key, name, at
     return this.call('PUT', '/series/id/' + series_id + '/', data, callback);
 }
 
-TempoDBClient.prototype.update_series_key = function(series_key, options, callback) {
-    /*
-        options
-            name (string)
-            tags (string or Array[string])
-            attr ({key: val, key2: val2})
-
-    */
-    return this.call('PUT', '/series/key/' + series_key + '/', options, callback);   
-}
-
 TempoDBClient.prototype.read = function(start, end, options, callback) {
     /*
         options
-            ids (Array of ids or single id)
-            keys (Array of keys or single key)
+            id (Array of ids or single id)
+            key (Array of keys or single key)
             interval (string)
             function (string)
 
