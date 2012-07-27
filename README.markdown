@@ -75,10 +75,12 @@ The following example creates two series, one with a given key of "my-custom-key
 
     var TempoDBClient = require('tempodb').TempoDBClient;
     var tempodb = new TempoDBClient('your-api-key', 'your-api-secret');
-    var cb = function(result){ console.log(result.response+': '+ JSON.stringify(result.body)); }
 
-    var series1 = tempodb.create_series('my-custom-key'), cb);
-    var series2 = tempodb.create_series(null, cb);
+    var series1;
+    tempodb.create_series('my-custom-key'), function(result) {
+        series1 = result.body;
+    });
+    tempodb.create_series(null, cb);
 
 
 ## TempoDBClient#get_series(*options*, *callback*)

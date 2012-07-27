@@ -39,9 +39,6 @@ TempoDBClient.prototype.call = function(method, path, body, callback) {
         this.headers['Content-Length'] = json_body.length;
     }
 
-    console.log(path);
-    console.log(json_body);
-
     var options = {
         host: this.hostname,
         port: this.port,
@@ -62,7 +59,12 @@ TempoDBClient.prototype.call = function(method, path, body, callback) {
             result = '';
             response = res.statusCode;
             if (data) {
-                result = JSON.parse(data);
+                if (response < 300) {
+                    result = JSON.parse(data);
+                }
+                else {
+                    result = data;
+                }
             }
 
             if (typeof callback != 'undefined') {
