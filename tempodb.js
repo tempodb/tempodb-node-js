@@ -20,7 +20,11 @@ var TempoDBClient = exports.TempoDBClient =
 
         var hostname = options.hostname || HOST;
         var auth = 'Basic ' + new Buffer(key+':'+secret).toString('base64');
-        var headers = {'Host': hostname, 'Authorization': auth};
+        var headers = {
+                'Host': hostname,
+                'Authorization': auth,
+                'User-Agent': "tempodb-nodejs/0.2.1"
+        };
 
         this.key = key;
         this.secret = secret;

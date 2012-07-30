@@ -1,7 +1,7 @@
 /* http://tempo-db.com/api/read-series/#read-series-by-key */
 
 var TempoDBClient = require('tempodb').TempoDBClient;
-var tempodb = new TempoDBClient('myagley', 'opensesame');
+var tempodb = new TempoDBClient('your-api-key', 'your-api-secret');
 
 var series_key = 'your-custom-key',
 	series_start_date = new Date('2012-01-01'),
