@@ -18,13 +18,10 @@ var data = {
     ]
 }
 
-var start_time = new Date();
-
 tempodb.write_bulk(data, function(result){
     var out = result.response;
     if (result.body) {
         out += ': ' + JSON.stringify(result.body);
     }
     console.log(out+'\n');
-    console.log('Completed in', new Date() - start_time, 'ms\n');
 });

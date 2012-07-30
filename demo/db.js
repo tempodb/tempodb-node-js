@@ -6,4 +6,11 @@ var options = {
     tag: ['foo']
 }
 
-var series = tempodb.get_series(options, cb);
+tempodb.get_series(null, function(result){
+    if (result.response == 200) {
+        for (var i = 0; i < result.body.length; i++) {
+            var series = result.body[i];
+            console.log(series.id, series.key);
+        }
+    }
+});
