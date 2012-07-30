@@ -9,7 +9,7 @@ var series_key = 'your-custom-key',
 
 // read a date range
 var options = {
-	keys: series_key,
+	key: series_key,
 	interval: '1hour',
 	'function': 'mean'
 }
