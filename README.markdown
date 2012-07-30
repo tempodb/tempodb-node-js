@@ -475,7 +475,7 @@ The following example reads data for the series with id *your-custom-key* and re
         'function': 'min'
     }
 
-    tempodb.read_id(series_id, series_start_date, series_end_date, options, cb);
+    tempodb.read_key(series_key, series_start_date, series_end_date, options, cb);
 
 
 ## TempoDBClient#write_id(*series_id*, *data*, *callback*)
