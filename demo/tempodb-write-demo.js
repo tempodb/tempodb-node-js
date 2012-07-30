@@ -20,14 +20,9 @@ for (var day = 0; day < 10; day++) {
         data.push({t:new Date(series_start_date.getTime() + min * MS_IN_MIN), v:Math.random()*50})
     }
 
-    var add_args = {
-        series_key: series_key,
-        data: data
-    }
-
     console.log(day, data[0]);
 
-    tempodb.write(add_args, function(result){
+    tempodb.write_key(series_key, data, function(result){
         var out = result.response;
         if (result.body) {
             out += ': ' + JSON.stringify(result.body);

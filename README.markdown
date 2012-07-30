@@ -476,3 +476,106 @@ The following example reads data for the series with id *your-custom-key* and re
     }
 
     tempodb.read_id(series_id, series_start_date, series_end_date, options, cb);
+
+
+## TempoDBClient#write_id(*series_id*, *data*, *callback*)
+Write datapoints to the specified series id.
+
+### Parameters
+
+* series_id - id for the series to write to (string)
+* data - the data to write (Array of {t, v} Objects)
+
+### Returns
+
+Nothing
+
+### Example
+
+The following example writes three datapoints to the series with id *6fefeba655504694b21235acf8cdae5f*.
+
+    var TempoDBClient = require('tempodb').TempoDBClient;
+    var tempodb = new TempoDBClient('your-api-key', 'your-api-secret');
+    var cb = function(result){ console.log(result.response+': '+ JSON.stringify(result.body)); }
+
+    var series_id = '6fefeba655504694b21235acf8cdae5f';
+
+    var data = [
+        { t: new Date("2012-01-12 14:11:00"), v: 55.231 },
+        { t: new Date("2012-01-12 14:12:00"), v: 47.143 },
+        { t: new Date("2012-01-12 14:13:00"), v: 49.856 }
+    ];
+
+    tempodb.write_id(series_id, data, cb);
+
+
+## TempoDBClient#write_key(*series_key*, *data*, *callback*)
+Write datapoints to the specified series key.
+
+### Parameters
+
+* series_key - key for the series to write to (string)
+* data - the data to write (Array of {t, v} Objects)
+
+### Returns
+
+Nothing
+
+### Example
+
+The following example writes three datapoints to the series with key *your-custom-key*.
+
+    var TempoDBClient = require('tempodb').TempoDBClient;
+    var tempodb = new TempoDBClient('your-api-key', 'your-api-secret');
+    var cb = function(result){ console.log(result.response+': '+ JSON.stringify(result.body)); }
+
+    var series_key = 'your-custom-key';
+
+    var data = [
+        { t: new Date("2012-01-12 14:11:00"), v: 55.231 },
+        { t: new Date("2012-01-12 14:12:00"), v: 47.143 },
+        { t: new Date("2012-01-12 14:13:00"), v: 49.856 }
+    ];
+
+    tempodb.write_key(series_key, data, cb);
+
+
+## TempoDBClient#write_bulk(*series_id*, *data*, *callback*)
+Write datapoints to multiple series for a single timestamp.  This function takes a timestmap and a parameter called data which is an Array of Objects containing either the series id or series key and the value.  For example:
+
+    data = [
+        { id: "6fefeba655504694b21235acf8cdae5f", v: 14.3654 },
+        { id: "01868c1a2aaf416ea6cd8edd65e7a4b8", v: 27.234 },
+        { key: "your-custom-key", v: 1 },
+        { key: "your-custom-key-2", v: 34.654 },
+        { id: "38268c3b231f1266a392931e15e99231", v: 9912.75 },
+    ];
+
+### Parameters
+
+* ts - the timestamp for the datapoints
+* data - the data to write (Array of {id, v} or {key, v} Objects)
+
+### Returns
+
+Nothing
+
+### Example
+
+The following example writes three datapoints to the series with id *6fefeba655504694b21235acf8cdae5f*.
+
+    var TempoDBClient = require('tempodb').TempoDBClient;
+    var tempodb = new TempoDBClient('your-api-key', 'your-api-secret');
+    var cb = function(result){ console.log(result.response+': '+ JSON.stringify(result.body)); }
+
+    var ts = new Date("2012-01-12 14:13:09");
+
+    data = [
+        { id: "6fefeba655504694b21235acf8cdae5f", v: 14.3654 },
+        { id: "01868c1a2aaf416ea6cd8edd65e7a4b8", v: 27.234 },
+        { key: "your-custom-key", v: 1 },
+        { key: "your-custom-key-2", v: 34.654 },
+        { id: "38268c3b231f1266a392931e15e99231", v: 9912.75 },
+    ];
+
+    tempodb.write_bulk(ts, data, cb);
