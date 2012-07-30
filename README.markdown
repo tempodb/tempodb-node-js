@@ -79,7 +79,7 @@ The newly created series object
 
 ### Example
 
-The following example creates two series, one with a given key of "my-custom-key", one with a randomly generated key.
+The following example creates two series: one with a given key of "my-custom-key" and one without a key specified.
 
     var TempoDBClient = require('tempodb').TempoDBClient;
     var tempodb = new TempoDBClient('your-api-key', 'your-api-secret');
@@ -147,15 +147,15 @@ The following example returns all series with tags "tag1" and "tag2" and attribu
     }
 
     tempodb.get_series(options, function(result){
-    if (result.response == 200) {
-        var series_list = result.body;
+        if (result.response == 200) {
+            var series_list = result.body;
 
-        for (var i = 0; i < series_list.length; i++) {
-            var series = series_list[i];
-            console.log(series.id, series.key);
+            for (var i = 0; i < series_list.length; i++) {
+                var series = series_list[i];
+                console.log(series.id, series.key);
+            }
         }
-    }
-});
+    });
 
 
 ## TempoDBClient#update_series(*series_id*, *series_key*, *name*, *attributes*, *tags*, *callback*)
@@ -173,11 +173,11 @@ Updates a series.  Currently, only tags and attributes can be modified. The easi
 The updated series object
 
     { 
-     "id":"92a81e6936c24274b6bb53c57004afce",
-     "key":"test1",
-     "name":"",
-     "attributes":{unit: 'Fahrenheit', user_id: 27},
-     "tags":['foo', 'bar']
+      "id":"92a81e6936c24274b6bb53c57004afce",
+      "key":"test1",
+      "name":"",
+      "attributes":{unit: 'Fahrenheit', user_id: 27},
+      "tags":['foo', 'bar']
     }
 
 ### Example
