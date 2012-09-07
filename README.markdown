@@ -28,7 +28,7 @@ node tempodb-write-demo
 node tempodb-read-demo
 ```
 
-# TempoDBClient Object 
+# TempoDBClient Object
 
 Stores the session information for authenticating and accessing TempoDB.  You can specify an optional hostname, port, protocol (http or https), and version. This is used if you are on a private cluster.
 The default hostname and port should work for the standard cluster.
@@ -69,7 +69,7 @@ Creates a new series with an optionally specified key.  If no key is given, only
 ### Returns
 The newly created series object
 
-    { 
+    {
      "id":"71a81e6936c24274b6bb53c57004af8b",
      "key":"my-custom-key",
      "name":"",
@@ -172,7 +172,7 @@ Updates a series.  Currently, only tags and attributes can be modified. The easi
 ### Returns
 The updated series object
 
-    { 
+    {
       "id":"92a81e6936c24274b6bb53c57004afce",
       "key":"test1",
       "name":"",
@@ -203,7 +203,7 @@ The following example reads the list of series with key *test1* (should only be 
 
 
 ## TempoDBClient#read(*start*, *end*, *options*, *callback*)
-Gets one or more series and corresponding time-series data between the specified start and end dates.  The optional interval parameter allows you to specify a rollup period. For example, "1hour" will roll the data up on the hour using the provided function. The function parameter specifies the folding function to use while rolling the data up. A rollup is selected automatically if no interval or function is given. The auto rollup interval is calculated by the total time range (end - start) as follows:
+Gets one or more series and corresponding time series data between the specified start and end dates.  The optional interval parameter allows you to specify a rollup period. For example, "1hour" will roll the data up on the hour using the provided function. The function parameter specifies the folding function to use while rolling the data up. A rollup is selected automatically if no interval or function is given. The auto rollup interval is calculated by the total time range (end - start) as follows:
 
 * range <= 2 days - raw data is returned
 * range <= 30 days - data is rolled up on the hour
@@ -242,12 +242,13 @@ You can also retrieve raw data by specifying "raw" as the interval. The series t
         * can also pass single string if only one key
     * tag - an array of tags to filter on. These tags are and'd together (array of strings)
     * attr - an object of attribute key/value pairs to filter on. These attributes are and'd together. (object)
+    * tz - desired output timezone (string).  [View valid timezones](http://joda-time.sourceforge.net/timezones.html).
 
 
 
 ### Returns
 
-An array of Objects containing the series information, time-series data, and a summary of statistics for the specified time period.
+An array of Objects containing the series information, time series data, and a summary of statistics for the specified time period.
 
     [
         {
@@ -260,13 +261,18 @@ An array of Objects containing the series information, time-series data, and a s
             },
             start: '2012-01-01T00:00:00.000+0000',
             end: '2012-01-02T00:00:00.000+0000',
-            data: [ 
+            data: [
                 { t: '2012-01-01T00:00:00.000+0000', v: 23.559637793913357 },
                 { t: '2012-01-01T01:00:00.000+0000', v: 24.887018265425514 },
                 { t: '2012-01-01T02:00:00.000+0000', v: 24.103298434838965 },
                 ...
                 { t: '2012-01-01T23:00:00.000+0000', v: 23.1820437503413 }
             ],
+            rollup: {
+                interval: 1hour,
+                'function': 'mean',
+                'tz': 'America/Chicago'
+            },
             summary: {
                 sum: 35680.95450980151,
                 mean: 24.778440631806603,
@@ -287,7 +293,7 @@ An array of Objects containing the series information, time-series data, and a s
             },
             start: '2012-01-01T00:00:00.000+0000',
             end: '2012-01-02T00:00:00.000+0000',
-            data: [ 
+            data: [
                 { t: '2012-01-01T00:00:00.000+0000', v: 17.43 },
                 { t: '2012-01-01T01:00:00.000+0000', v: 21.42232 },
                 { t: '2012-01-01T02:00:00.000+0000', v: 20.32423 },
@@ -321,7 +327,8 @@ The following example reads the list of series with key *your-custom-key* (shoul
     var options = {
         key: series_key,
         interval: '1hour',
-        'function': 'mean'
+        'function': 'mean',
+        tz: 'America/Chicago'
     }
 
     tempodb.read(series_start_date, series_end_date, options, function(result){
@@ -333,7 +340,7 @@ The following example reads the list of series with key *your-custom-key* (shoul
 
 
 ## TempoDBClient#read_id(*series_id*, *start*, *end*, *options*, *callback*)
-Gets a single series by id and corresponding time-series data between the specified start and end dates.  The same rollup rules apply as with the read() function above.
+Gets a single series by id and corresponding time series data between the specified start and end dates.  The same rollup rules apply as with the read() function above.
 
 ### Parameters
 
@@ -350,12 +357,13 @@ Gets a single series by id and corresponding time-series data between the specif
         * can also pass single string if only one key
     * tag - an array of tags to filter on. These tags are and'd together (array of strings)
     * attr - an object of attribute key/value pairs to filter on. These attributes are and'd together. (object)
+    * tz - desired output timezone (string).  [View valid timezones](http://joda-time.sourceforge.net/timezones.html).
 
 
 
 ### Returns
 
-An Object containing the series information, time-series data, and a summary of statistics for the specified time period.
+An Object containing the series information, time series data, and a summary of statistics for the specified time period.
 
     {
         series: {
@@ -367,13 +375,18 @@ An Object containing the series information, time-series data, and a summary of 
         },
         start: '2012-01-01T00:00:00.000+0000',
         end: '2012-01-02T00:00:00.000+0000',
-        data: [ 
+        data: [
             { t: '2012-01-01T00:00:00.000+0000', v: 23.559637793913357 },
             { t: '2012-01-01T01:00:00.000+0000', v: 24.887018265425514 },
             { t: '2012-01-01T02:00:00.000+0000', v: 24.103298434838965 },
             ...
             { t: '2012-01-01T23:00:00.000+0000', v: 23.1820437503413 }
         ],
+        rollup: {
+            interval: 1day,
+            'function': 'min',
+            'tz': 'America/Chicago'
+        },
         summary: {
             sum: 35680.95450980151,
             mean: 24.778440631806603,
@@ -399,14 +412,15 @@ The following example reads data for the series with id *6fefeba655504694b21235a
 
     var options = {
         interval: '1day',
-        'function': 'min'
+        'function': 'min',
+        tz: 'America/Chicago'
     }
 
     tempodb.read_id(series_id, series_start_date, series_end_date, options, cb);
 
 
 ## TempoDBClient#read_key(*series_key*, *start*, *end*, *options*, *callback*)
-Gets a single series by key and corresponding time-series data between the specified start and end dates.  The same rollup rules apply as with the read() function above.
+Gets a single series by key and corresponding time series data between the specified start and end dates.  The same rollup rules apply as with the read() function above.
 
 ### Parameters
 
@@ -423,12 +437,13 @@ Gets a single series by key and corresponding time-series data between the speci
         * can also pass single string if only one key
     * tag - an array of tags to filter on. These tags are and'd together (array of strings)
     * attr - an object of attribute key/value pairs to filter on. These attributes are and'd together. (object)
+    * tz - desired output timezone (string).  [View valid timezones](http://joda-time.sourceforge.net/timezones.html).
 
 
 
 ### Returns
 
-An Object containing the series information, time-series data, and a summary of statistics for the specified time period.
+An Object containing the series information, time series data, and a summary of statistics for the specified time period.
 
     {
         series: {
@@ -440,13 +455,18 @@ An Object containing the series information, time-series data, and a summary of 
         },
         start: '2012-01-01T00:00:00.000+0000',
         end: '2012-01-02T00:00:00.000+0000',
-        data: [ 
+        data: [
             { t: '2012-01-01T00:00:00.000+0000', v: 23.559637793913357 },
             { t: '2012-01-01T01:00:00.000+0000', v: 24.887018265425514 },
             { t: '2012-01-01T02:00:00.000+0000', v: 24.103298434838965 },
             ...
             { t: '2012-01-01T23:00:00.000+0000', v: 23.1820437503413 }
         ],
+        rollup: {
+            interval: 1day,
+            'function': 'min',
+            'tz': 'America/Chicago'
+        },
         summary: {
             sum: 35680.95450980151,
             mean: 24.778440631806603,
@@ -472,7 +492,8 @@ The following example reads data for the series with id *your-custom-key* and re
 
     var options = {
         interval: '1day',
-        'function': 'min'
+        'function': 'min',
+        tz: 'America/Chicago'
     }
 
     tempodb.read_key(series_key, series_start_date, series_end_date, options, cb);
