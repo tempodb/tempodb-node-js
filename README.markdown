@@ -242,7 +242,7 @@ You can also retrieve raw data by specifying "raw" as the interval. The series t
         * can also pass single string if only one key
     * tag - an array of tags to filter on. These tags are and'd together (array of strings)
     * attr - an object of attribute key/value pairs to filter on. These attributes are and'd together. (object)
-    * tz - desired output timezone (string).  [View valid timezones](http://joda-time.sourceforge.net/timezones.html).
+    * tz - desired output timezone (string).  [View valid timezones](http://tempo-db.com/docs/api/timezone/).
 
 
 
@@ -357,7 +357,7 @@ Gets a single series by id and corresponding time series data between the specif
         * can also pass single string if only one key
     * tag - an array of tags to filter on. These tags are and'd together (array of strings)
     * attr - an object of attribute key/value pairs to filter on. These attributes are and'd together. (object)
-    * tz - desired output timezone (string).  [View valid timezones](http://joda-time.sourceforge.net/timezones.html).
+    * tz - desired output timezone (string).  [View valid timezones](http://tempo-db.com/docs/api/timezone/).
 
 
 
@@ -437,7 +437,7 @@ Gets a single series by key and corresponding time series data between the speci
         * can also pass single string if only one key
     * tag - an array of tags to filter on. These tags are and'd together (array of strings)
     * attr - an object of attribute key/value pairs to filter on. These attributes are and'd together. (object)
-    * tz - desired output timezone (string).  [View valid timezones](http://joda-time.sourceforge.net/timezones.html).
+    * tz - desired output timezone (string).  [View valid timezones](http://tempo-db.com/docs/api/timezone/).
 
 
 
