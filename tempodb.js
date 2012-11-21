@@ -2,7 +2,7 @@ var http = require('http');
 var https = require('https');
 var ID = 'TempoDB: ';
 
-var TempoDBClient = exports.TempoDBClient = 
+var TempoDBClient = exports.TempoDBClient =
     function(key, secret, options) {
         /*
             options
@@ -12,7 +12,7 @@ var TempoDBClient = exports.TempoDBClient =
                 version (string)
         */
         options = options || {};
-        
+
         const HOST = 'api.tempo-db.com',
               PORT = 443,
               VERSION = 'v1',
@@ -42,6 +42,9 @@ TempoDBClient.prototype.call = function(method, path, body, callback) {
         json_body = JSON.stringify(body);
         this.headers['Content-Length'] = json_body.length;
     }
+    else {
+      this.headers['Content-Length'] = 0
+    }
 
     var options = {
         host: this.hostname,
@@ -57,7 +60,7 @@ TempoDBClient.prototype.call = function(method, path, body, callback) {
         //the listener that handles the response chunks
         res.addListener('data', function (chunk) {
             data += chunk.toString();
-		});
+        });
 
         res.addListener('end', function() {
             result = '';
@@ -107,7 +110,7 @@ TempoDBClient.prototype.get_series = function(options, callback) {
     */
     options = options || {};
     query_string = '?' + EncodeQueryData(options);
-    
+
     return this.call('GET', '/series/' + query_string, null, callback);
 }
 
@@ -211,6 +214,28 @@ TempoDBClient.prototype.increment_bulk = function(ts, data, callback) {
 
     return this.call('POST', '/increment/', body, callback);
 }
+
+TempoDBClient.prototype.delete_id = function(series_id, start, end, callback) {
+  var options = {
+    start: ISODateString(start),
+    end:   ISODateString(end)
+  }
+  var query_string = '?' + EncodeQueryData(options);
+
+  return this.call('DELETE', '/series/id/'+series_id+'/data/'+query_string, null, callback);
+}
+
+TempoDBClient.prototype.delete_key = function(series_key, start, end, callback) {
+  var options = {
+    start: ISODateString(start),
+    end:   ISODateString(end)
+  }
+
+  var query_string = '?' + EncodeQueryData(options);
+
+  return this.call('DELETE', '/series/key/'+series_key+'/data/'+query_string, null, callback);
+}
+
 
 var EncodeQueryData = function(data) {
    var ret = [];
