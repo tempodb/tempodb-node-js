@@ -1,5 +1,6 @@
 var http = require('http');
 var https = require('https');
+var zlib = require('zlib');
 var ID = 'TempoDB: ';
 
 var TempoDBClient = exports.TempoDBClient =
@@ -23,7 +24,8 @@ var TempoDBClient = exports.TempoDBClient =
         var headers = {
                 'Host': hostname,
                 'Authorization': auth,
-                'User-Agent': "tempodb-nodejs/0.2.1"
+                'User-Agent': "tempodb-nodejs/0.2.1",
+                'Accept-Encoding': 'gzip'
         };
 
         this.key = key;
@@ -56,6 +58,11 @@ TempoDBClient.prototype.call = function(method, path, body, callback) {
 
     var req = this.connection.request(options, function (res) {
         var data = '';
+        var response = res.statusCode;
+
+        if(res.headers['content-encoding'] == 'gzip') {
+          res = res.pipe(zlib.createGunzip());
+        }
 
         //the listener that handles the response chunks
         res.addListener('data', function (chunk) {
@@ -64,7 +71,6 @@ TempoDBClient.prototype.call = function(method, path, body, callback) {
 
         res.addListener('end', function() {
             result = '';
-            response = res.statusCode;
             if (data) {
                 if (response < 300) {
                     result = JSON.parse(data);
