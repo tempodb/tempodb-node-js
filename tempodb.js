@@ -25,7 +25,8 @@ var TempoDBClient = exports.TempoDBClient =
                 'Host': hostname,
                 'Authorization': auth,
                 'User-Agent': "tempodb-nodejs/0.2.1",
-                'Accept-Encoding': 'gzip'
+                'Accept-Encoding': 'gzip',
+                'Connection': 'keep-alive'
         };
 
         this.key = key;
