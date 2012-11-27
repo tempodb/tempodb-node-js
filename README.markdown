@@ -703,3 +703,58 @@ The following example increments 5 separate series at the same timestamp.
     ];
 
     tempodb.increment_bulk(ts, data, cb);
+
+## TempoDBClient#delete_id(*series_id*, *start*, *end*, *callback*)
+Deletes a range of data for a series referenced by id between the specified start and end dates. As with the read api, the start date is inclusive and the end date is exclusive. i.e. \[start, end)
+
+### Parameters
+
+* series_id - id for the series to delete from (string)
+* start - start time for the query (Date, inclusive)
+* end - end time for the query (Date, exclusive)
+
+### Returns
+
+A 200 OK, if successful
+
+### Example
+
+The following example deletes data for the series with id *6fefeba655504694b21235acf8cdae5f* between 2012-01-01 and 2012-01-14.
+
+    var TempoDBClient = require('tempodb').TempoDBClient;
+    var tempodb = new TempoDBClient('your-api-key', 'your-api-secret');
+    var cb = function(result){ console.log(result.response+': '+ JSON.stringify(result.body)); }
+
+    var series_id = '6fefeba655504694b21235acf8cdae5f';
+    series_start_date = new Date('2012-01-01');
+    series_end_date = new Date('2012-01-14');
+
+    tempodb.delete_id(series_id, series_start_date, series_end_date, cb);
+
+
+## TempoDBClient#delete_key(*series_key*, *start*, *end*, *callback*)
+Deletes a range of data from a series referenced by key between the specified start and end dates. As with the read api, the start is inclusive and the end date is exclusive. \[start, end)
+
+### Parameters
+
+* series_key - key for the series to delete from (string)
+* start - start time for the query (Date)
+* end - end time for the query (Date)
+
+### Returns
+
+A 200 OK, if successful
+
+### Example
+
+The following example deletes data for the series with key *your-custom-key* between 2012-01-01 and 2012-01-14.
+
+    var TempoDBClient = require('tempodb').TempoDBClient;
+    var tempodb = new TempoDBClient('your-api-key', 'your-api-secret');
+    var cb = function(result){ console.log(result.response+': '+ JSON.stringify(result.body)); }
+
+    var series_key = 'your-custom-key';
+    series_start_date = new Date('2012-01-01');
+    series_end_date = new Date('2012-01-14');
+
+    tempodb.delete_key(series_key, series_start_date, series_end_date, cb);
