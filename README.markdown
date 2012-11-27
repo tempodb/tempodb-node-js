@@ -738,8 +738,8 @@ Deletes a range of data from a series referenced by key between the specified st
 ### Parameters
 
 * series_key - key for the series to delete from (string)
-* start - start time for the query (Date)
-* end - end time for the query (Date)
+* start - start time for the query (Date, inclusive)
+* end - end time for the query (Date, exclusive)
 
 ### Returns
 
