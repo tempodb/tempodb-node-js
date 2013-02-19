@@ -18,7 +18,7 @@ npm install tempodb
 node tempodb-write-demo
 ```
 
-1. Download [tempodb-read-demo.js](https://github.com/tempodb/tempodb-node-js/blob/master/examples/tempodb-read-demo.js)
+1. Download [tempodb-read-demo.js](https://github.com/tempodb/tempodb-node-js/blob/master/demo/tempodb-read-demo.js)
 
 1. Edit *your-api-key* and *your-api-secret* in tempodb-read-demo.js.
 
