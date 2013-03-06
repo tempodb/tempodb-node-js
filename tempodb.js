@@ -198,7 +198,7 @@ TempoDBClient.prototype.write_key = function(series_key, data, callback) {
 
 TempoDBClient.prototype.write_bulk = function(ts, data, callback) {
     var body = {
-        ts: ISODateString(ts),
+        t: ISODateString(ts),
         data: data
     }
 
@@ -215,7 +215,7 @@ TempoDBClient.prototype.increment_key = function(series_key, data, callback) {
 
 TempoDBClient.prototype.increment_bulk = function(ts, data, callback) {
     var body = {
-        ts: ISODateString(ts),
+        t: ISODateString(ts),
         data: data
     }
 
