@@ -269,6 +269,11 @@ var EncodeQueryData = function(data) {
 }
 
 var ISODateString = function(d) {
+    // If you pass a string for a date we will assume that it is already in ISO format
+    if(typeof(d) == 'string') {
+        return d;
+    }
+
     function pad(n) {
         return n<10 ? '0' + n : n;
     }
