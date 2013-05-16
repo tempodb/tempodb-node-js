@@ -57,6 +57,14 @@ Most of the API functions allow you to pass in an optional *callback* function. 
 * *response* (Integer) - the HTTP response code
 * *body* (Object or string)- the parsed JSON body of successful API calls.  For calls that return error codes, the plain text body is returned.
 
+However, You can supply a second argument to the callback function that will capture any errors with the call. This error object will contain the standard node.js HTTP library error objects. An example of this usage.
+
+    tempodb.read_key(series_key, series_start_date, series_end_date, options, function(result, error) {
+      if(error) throw error;
+      // Do something with result.
+    });
+
+
 The return types below show what is returned in the *body* parameter of successful calls.
 
 ## TempoDBClient#create_series(*key*, *callback*)
