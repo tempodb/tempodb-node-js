@@ -88,6 +88,14 @@ TempoDBClient.prototype.call = function(method, path, body, callback) {
                 });
             }
         });
+
+        res.on('error', function(error) {
+            callback(null, error);
+        });
+    });
+
+    req.on('error', function (error) {
+        callback(null, error);
     });
 
     if (body) {
