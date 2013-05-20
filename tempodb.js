@@ -33,7 +33,7 @@ var TempoDBClient = exports.TempoDBClient =
         this.secret = secret;
         this.hostname = hostname;
         this.port = options.port || PORT;
-        this.connection = options.secure || SECURE ? https : http;
+        this.connection = (options.secure != false) && SECURE ? https : http; // Have to check if boolean is false and not just undefined
         this.version = options.version || VERSION;
         this.path = '/' + this.version;
         this.headers = headers;
@@ -88,6 +88,10 @@ TempoDBClient.prototype.call = function(method, path, body, callback) {
                 });
             }
         });
+    });
+
+    req.on('error', function (error) {
+        callback(null, error);
     });
 
     if (body) {
