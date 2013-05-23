@@ -71,7 +71,7 @@ TempoDBClient.prototype.call = function(method, path, body, callback) {
         });
 
         res.addListener('end', function() {
-            result = '';
+            var result = '';
             if (data) {
                 if (response < 300) {
                     result = JSON.parse(data);
@@ -120,7 +120,7 @@ TempoDBClient.prototype.get_series = function(options, callback) {
 
     */
     options = options || {};
-    query_string = '?' + EncodeQueryData(options);
+    var query_string = '?' + EncodeQueryData(options);
 
     return this.call('GET', '/series/' + query_string, null, callback);
 }
@@ -157,7 +157,7 @@ TempoDBClient.prototype.read = function(start, end, options, callback) {
     options = options || {};
     options.start = ISODateString(start);
     options.end = ISODateString(end);
-    query_string = '?' + EncodeQueryData(options);
+    var query_string = '?' + EncodeQueryData(options);
 
     return this.call('GET', '/data/' + query_string, null, callback);
 };
@@ -172,7 +172,7 @@ TempoDBClient.prototype.read_id = function(series_id, start, end, options, callb
     options = options || {};
     options.start = ISODateString(start);
     options.end = ISODateString(end);
-    query_string = '?' + EncodeQueryData(options);
+    var query_string = '?' + EncodeQueryData(options);
 
     return this.call('GET', '/series/id/' + series_id + '/data/' + query_string, null, callback);
 }
@@ -187,7 +187,7 @@ TempoDBClient.prototype.read_key = function(series_key, start, end, options, cal
     options = options || {};
     options.start = ISODateString(start);
     options.end = ISODateString(end);
-    query_string = '?' + EncodeQueryData(options);
+    var query_string = '?' + EncodeQueryData(options);
 
     return this.call('GET', '/series/key/' + series_key + '/data/' + query_string, null, callback);
 }
