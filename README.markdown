@@ -205,7 +205,7 @@ The following example reads the list of series with key *test1* (should only be 
             var series = result.body[0];
             var new_tags = ['foo', 'bar'];
             var new_attr = {unit: 'Fahrenheit', user_id: 27};
-            tempodb.update_series(series.id, series.key, series.name, new_tags, new_attr, cb);
+            tempodb.update_series(series.id, series.key, series.name, new_attr, new_tags, cb);
         }
     });
 
