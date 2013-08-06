@@ -618,7 +618,7 @@ Write datapoints to multiple series for multiple timestamps. This function takes
         { t: new Date("2012-01-12 14:12:00"), id: "01868c1a2aaf416ea6cd8edd65e7a4b8", v: 27.234 },
         { t: new Date("2012-01-12 14:13:00"), key: "your-custom-key", v: 1 },
         { t: new Date("2012-01-12 14:13:00"), key: "your-custom-key-2", v: 34.654 },
-        { t: new Date("2012-01-12 14:13:00"), id: "38268c3b231f1266a392931e15e99231", v: 9912.75 },
+        { t: new Date("2012-01-12 14:13:00"), id: "38268c3b231f1266a392931e15e99231", v: 9912.75 }
     ];
 
 ### Parameters
@@ -661,7 +661,7 @@ The following example writes 5 separate series at the same timestamp.
         { t: new Date("2012-01-12 14:12:00"), id: "01868c1a2aaf416ea6cd8edd65e7a4b8", v: 27.234 },
         { t: new Date("2012-01-12 14:13:00"), key: "your-custom-key", v: 1 },
         { t: new Date("2012-01-12 14:13:00"), key: "your-custom-key-2", v: 34.654 },
-        { t: new Date("2012-01-12 14:13:00"), id: "38268c3b231f1266a392931e15e99231", v: 9912.75 },
+        { t: new Date("2012-01-12 14:13:00"), id: "38268c3b231f1266a392931e15e99231", v: 9912.75 }
     ];
 
     tempodb.write_multi(data, cb);
@@ -764,7 +764,7 @@ The following example increments 5 separate series at the same timestamp.
         { id: "01868c1a2aaf416ea6cd8edd65e7a4b8", v: 5 },
         { key: "your-custom-key", v: 1 },
         { key: "your-custom-key-2", v: -7 },
-        { id: "38268c3b231f1266a392931e15e99231", v: 10 },
+        { id: "38268c3b231f1266a392931e15e99231", v: 10 }
     ];
 
     tempodb.increment_bulk(ts, data, cb);
@@ -778,7 +778,7 @@ Increment datapoints to multiple series for multiple timestamps. This function t
         { t: new Date("2012-01-12 14:12:00"), id: "01868c1a2aaf416ea6cd8edd65e7a4b8", v: 27.234 },
         { t: new Date("2012-01-12 14:13:00"), key: "your-custom-key", v: 1 },
         { t: new Date("2012-01-12 14:13:00"), key: "your-custom-key-2", v: 34.654 },
-        { t: new Date("2012-01-12 14:13:00"), id: "38268c3b231f1266a392931e15e99231", v: 9912.75 },
+        { t: new Date("2012-01-12 14:13:00"), id: "38268c3b231f1266a392931e15e99231", v: 9912.75 }
     ];
 
 ### Parameters
