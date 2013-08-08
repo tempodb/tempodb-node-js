@@ -627,7 +627,7 @@ Write datapoints to multiple series for multiple timestamps. This function takes
 
 ### Returns
 
-The return body is either empty on success (response code will be 200) or contains a list of response objects in event of a single or multi-point failure (response code will be 207). Each response object contains a status code and an Array of error messages. This Array has a one to one correspondence with the original Array. For example if you submitted this Array:
+The return body is either empty on success (response code will be 200) or contains a JSON object with a list of response objects in event of a single or multi-point failure (response code will be 207). Each response object contains a status code and an Array of error messages. This Array has a one to one correspondence with the original Array. For example if you submitted this Array:
 
     data = [
         { t: new Date("2012-01-12 14:11:00"), v: 123.4},
@@ -637,15 +637,17 @@ The return body is either empty on success (response code will be 200) or contai
 
 You would recieve a 207 in the response code and this Array in the response body:
 
-    [
-      { status: "422", messages: [ "Must provide a series ID or key" ] },
-      { status: "200", messages: [] },
-      { status: "422", messages: [
-                                  "Must provide a numeric value",
-                                  "Must provide a series ID or key"
-                                 ]
-      }
-    ]
+    {
+      multistatus: [
+        { status: "422", messages: [ "Must provide a series ID or key" ] },
+        { status: "200", messages: [] },
+        { status: "422", messages: [
+                                    "Must provide a numeric value",
+                                    "Must provide a series ID or key"
+                                   ]
+        }
+      ]
+    }
 
 
 ### Example
@@ -797,16 +799,17 @@ The return body is either empty on success (response code will be 200) or contai
 
 You would recieve a 207 in the response code and this Array in the response body:
 
-    [
-      { status: "422", messages: [ "Must provide a series ID or key" ] },
-      { status: "200", messages: [] },
-      { status: "422", messages: [
-                                  "Must provide a numeric value",
-                                  "Must provide a series ID or key"
-                                 ]
-      }
-    ]
-
+    {
+      multistatus: [
+        { status: "422", messages: [ "Must provide a series ID or key" ] },
+        { status: "200", messages: [] },
+        { status: "422", messages: [
+                                    "Must provide a numeric value",
+                                    "Must provide a series ID or key"
+                                   ]
+        }
+      ]
+    }
 
 ### Example
 
