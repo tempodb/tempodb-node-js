@@ -209,6 +209,14 @@ TempoDBClient.prototype.write_bulk = function(ts, data, callback) {
     return this.call('POST', '/data/', body, callback);
 }
 
+TempoDBClient.prototype.write_multi = function(data, callback) {
+    return this.call('POST', '/multi/', data, callback)
+}
+
+TempoDBClient.prototype.increment_multi = function(data, callback) {
+    return this.call('POST', '/multi/increment/', data, callback)
+}
+
 TempoDBClient.prototype.increment_id = function(series_id, data, callback) {
     return this.call('POST', '/series/id/' + series_id + '/increment/', data, callback);
 }

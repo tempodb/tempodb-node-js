@@ -610,6 +610,65 @@ The following example writes 5 separate series at the same timestamp.
     tempodb.write_bulk(ts, data, cb);
 
 
+## TempoDBClient#write_multi(*data*, *callback*)
+Write datapoints to multiple series for multiple timestamps. This function takes an Array of Objects containing the timestamp, either the series id or series key, and the value.  For example:
+
+    data = [
+        { t: new Date("2012-01-12 14:11:00"), id: "6fefeba655504694b21235acf8cdae5f", v: 14.3654 },
+        { t: new Date("2012-01-12 14:12:00"), id: "01868c1a2aaf416ea6cd8edd65e7a4b8", v: 27.234 },
+        { t: new Date("2012-01-12 14:13:00"), key: "your-custom-key", v: 1 },
+        { t: new Date("2012-01-12 14:13:00"), key: "your-custom-key-2", v: 34.654 },
+        { t: new Date("2012-01-12 14:13:00"), id: "38268c3b231f1266a392931e15e99231", v: 9912.75 }
+    ];
+
+### Parameters
+
+* data - the data to write (Array of {t, id, v} or {t, key, v} Objects)
+
+### Returns
+
+The return body is either empty on success (response code will be 200) or contains a JSON object with a list of response objects in event of a single or multi-point failure (response code will be 207). Each response object contains a status code and an Array of error messages. This Array has a one to one correspondence with the original Array. For example if you submitted this Array:
+
+    data = [
+        { t: new Date("2012-01-12 14:11:00"), v: 123.4},
+        { t: new Date("2012-01-12 14:11:00"), key:'your- custom-key', v:531},
+        {}
+    ]
+
+You would recieve a 207 in the response code and this Array in the response body:
+
+    {
+      multistatus: [
+        { status: "422", messages: [ "Must provide a series ID or key" ] },
+        { status: "200", messages: [] },
+        { status: "422", messages: [
+                                    "Must provide a numeric value",
+                                    "Must provide a series ID or key"
+                                   ]
+        }
+      ]
+    }
+
+
+### Example
+
+The following example writes 5 separate series at the same timestamp.
+
+    var TempoDBClient = require('tempodb').TempoDBClient;
+    var tempodb = new TempoDBClient('your-api-key', 'your-api-secret');
+    var cb = function(result){ console.log(result.response+': '+ JSON.stringify(result.body)); }
+
+    data = [
+        { t: new Date("2012-01-12 14:11:00"), key: "your-custom-key", v: 14.3654 },
+        { t: new Date("2012-01-12 14:12:00"), id: "01868c1a2aaf416ea6cd8edd65e7a4b8", v: 27.234 },
+        { t: new Date("2012-01-12 14:13:00"), key: "your-custom-key", v: 1 },
+        { t: new Date("2012-01-12 14:13:00"), key: "your-custom-key-2", v: 34.654 },
+        { t: new Date("2012-01-12 14:13:00"), id: "38268c3b231f1266a392931e15e99231", v: 9912.75 }
+    ];
+
+    tempodb.write_multi(data, cb);
+
+
 ## TempoDBClient#increment_id(*series_id*, *data*, *callback*)
 Increments the value of the specified series id at the given timestamp. The value of the datapoint is the amount to increment (can be a positive or negative value). This is similar to a write, however the value is incremented by the datapoint value instead of overwritten. Values are incremented atomically, so this is useful for counting events.
 
@@ -707,10 +766,69 @@ The following example increments 5 separate series at the same timestamp.
         { id: "01868c1a2aaf416ea6cd8edd65e7a4b8", v: 5 },
         { key: "your-custom-key", v: 1 },
         { key: "your-custom-key-2", v: -7 },
-        { id: "38268c3b231f1266a392931e15e99231", v: 10 },
+        { id: "38268c3b231f1266a392931e15e99231", v: 10 }
     ];
 
     tempodb.increment_bulk(ts, data, cb);
+
+
+## TempoDBClient#increment_multi(*data*, *callback*)
+Increment datapoints to multiple series for multiple timestamps. This function takes an Array of Objects containing the timestamp, either the series id or series key, and the value.  For example:
+
+    data = [
+        { t: new Date("2012-01-12 14:11:00"), id: "6fefeba655504694b21235acf8cdae5f", v: 14.3654 },
+        { t: new Date("2012-01-12 14:12:00"), id: "01868c1a2aaf416ea6cd8edd65e7a4b8", v: 27.234 },
+        { t: new Date("2012-01-12 14:13:00"), key: "your-custom-key", v: 1 },
+        { t: new Date("2012-01-12 14:13:00"), key: "your-custom-key-2", v: 34.654 },
+        { t: new Date("2012-01-12 14:13:00"), id: "38268c3b231f1266a392931e15e99231", v: 9912.75 }
+    ];
+
+### Parameters
+
+* data - the data to write (Array of {t, id, v} or {t, key, v} Objects)
+
+### Returns
+
+The return body is either empty on success (response code will be 200) or contains a list of response objects in event of a single or multi-point failure (response code will be 207). Each response object contains a status code and an Array of error messages. This Array has a one to one correspondence with the original Array. For example if you submitted this Array:
+
+    data = [
+        { t: new Date("2012-01-12 14:11:00"), v: 123.4},
+        { t: new Date("2012-01-12 14:11:00"), key: "your- custom-key", v:531},
+        {}
+    ]
+
+You would recieve a 207 in the response code and this Array in the response body:
+
+    {
+      multistatus: [
+        { status: "422", messages: [ "Must provide a series ID or key" ] },
+        { status: "200", messages: [] },
+        { status: "422", messages: [
+                                    "Must provide a numeric value",
+                                    "Must provide a series ID or key"
+                                   ]
+        }
+      ]
+    }
+
+### Example
+
+The following example increments 5 separate series at the same timestamp.
+
+    var TempoDBClient = require('tempodb').TempoDBClient;
+    var tempodb = new TempoDBClient('your-api-key', 'your-api-secret');
+    var cb = function(result){ console.log(result.response+': '+ JSON.stringify(result.body)); }
+
+    data = [
+        { t: new Date("2012-01-12 14:11:00"), key: "your-custom-key", v: 14 },
+        { t: new Date("2012-01-12 14:12:00"), id: "01868c1a2aaf416ea6cd8edd65e7a4b8", v: 27 },
+        { t: new Date("2012-01-12 14:13:00"), key: "your-custom-key", v: 1 },
+        { t: new Date("2012-01-12 14:13:00"), key: "your-custom-key-2", v: 34 },
+        { t: new Date("2012-01-12 14:13:00"), id: "38268c3b231f1266a392931e15e99231", v: -7 },
+    ];
+
+    tempodb.increment_multi(data, cb);
+
 
 ## TempoDBClient#delete_id(*series_id*, *start*, *end*, *callback*)
 Deletes a range of data for a series referenced by id between the specified start and end dates. As with the read api, the start date is inclusive and the end date is exclusive. i.e. \[start, end)
