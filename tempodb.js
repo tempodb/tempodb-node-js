@@ -125,6 +125,22 @@ TempoDBClient.prototype.get_series = function(options, callback) {
     return this.call('GET', '/series/' + query_string, null, callback);
 }
 
+TempoDBClient.prototype.delete_series = function(options, callback) {
+    /*
+        options
+            id (Array of ids or single id)
+            key (Array of keys or single key)
+            tag (string or Array[string])
+            attr ({key: val, key2: val2})
+            allow_truncation (Boolean)
+
+    */
+    options = options || {};
+    var query_string = '?' + EncodeQueryData(options);
+
+    return this.call('DELETE', '/series/' + query_string, null, callback);
+}
+
 TempoDBClient.prototype.update_series = function(series_id, series_key, name, attributes, tags, callback) {
     if (!(tags instanceof Array)) {
         throw ID + 'tags must be an array';
@@ -273,7 +289,7 @@ var EncodeQueryData = function(data) {
         }
         else {
             // plain value
-            ret.push(encodeURIComponent(key) + "=" + encodeURIComponent(value));
+            ret.push(encodeURIComponent(key) + "=" + encodeURIComponent(value.toString()));
         }
     }
 
