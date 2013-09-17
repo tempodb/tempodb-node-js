@@ -209,6 +209,44 @@ The following example reads the list of series with key *test1* (should only be 
         }
     });
 
+## TempoDBClient#delete_series(*options*, callback)
+Delete series objects by the given filter criteria.
+This method has the same query parameters as `get_series`. Series can be
+deleted by id, key, tag and attribute. You must specify at least one filter
+query param for deletion. If you want to truncate your database (remove all
+series), you must specify `allow_truncation: true`.
+
+### Parameters
+* id - an array of ids to include (Array of strings)
+* key - an array of keys to include (Array of strings)
+* tag - an array of tags to filter on. These tags are and'd together (Array of strings)
+* attr - a object of key/value pairs to filter on. These attributes are and'd together. (Object)
+* allow_truncation - a boolean that must be passed when you wish to delete all your series. Mutually exclusive with the filter query parameters. (Boolean)
+
+### Returns
+A summary of the delete operation, the value deleted is the number of series deleted.
+
+    { response: 200, body: { deleted: 7 } }
+
+### Example
+
+The following example deletes all series with "tag1" and "tag2" and attribute "attr1" equal to "value1".
+
+    var TempoDBClient = require('tempodb').TempoDBClient;
+    var tempodb = new TempoDBClient('your-api-key', 'your-api-secret');
+    var cb = function(result){ console.log(result); }
+
+    var tags = ['tag1', 'tag2'];
+    var attributes = { attr1: "value1" };
+
+    var options = {
+      tag: ['tag1', 'tag2'],
+      attr: {
+        attr1: "value1"
+      }
+    };
+
+    tempodb.delete_series(options, cb);
 
 ## TempoDBClient#read(*start*, *end*, *options*, *callback*)
 Gets one or more series and corresponding time series data between the specified start and end dates.  The optional interval parameter allows you to specify a rollup period. For example, "1hour" will roll the data up on the hour using the provided function. The function parameter specifies the folding function to use while rolling the data up. A rollup is selected automatically if no interval or function is given. The auto rollup interval is calculated by the total time range (end - start) as follows:
