@@ -39,7 +39,12 @@ var TempoDBClient = exports.TempoDBClient =
         this.headers = headers;
     }
 
-TempoDBClient.prototype.call = function(method, path, body, callback) {
+TempoDBClient.prototype.call = function(method, path, queryParams, body, callback) {
+    path = this.path + encodeURI(path);
+    if(queryParams) {
+        path += '?' + EncodeQueryData(queryParams);
+    }
+
     var json_body = '';
     if (body) {
         json_body = JSON.stringify(body);
@@ -52,7 +57,7 @@ TempoDBClient.prototype.call = function(method, path, body, callback) {
     var options = {
         host: this.hostname,
         port: this.port,
-        path: this.path+path || this.path,
+        path: path,
         method: method,
         headers: this.headers
     };
@@ -107,7 +112,7 @@ TempoDBClient.prototype.create_series = function(key, callback) {
         data.key = key;
     }
 
-    return this.call('POST', '/series/', data, callback);
+    return this.call('POST', '/series/', null, data, callback);
 }
 
 TempoDBClient.prototype.get_series = function(options, callback) {
@@ -120,9 +125,7 @@ TempoDBClient.prototype.get_series = function(options, callback) {
 
     */
     options = options || {};
-    var query_string = '?' + EncodeQueryData(options);
-
-    return this.call('GET', '/series/' + query_string, null, callback);
+    return this.call('GET', '/series/', options, null, callback);
 }
 
 TempoDBClient.prototype.delete_series = function(options, callback) {
@@ -136,9 +139,7 @@ TempoDBClient.prototype.delete_series = function(options, callback) {
 
     */
     options = options || {};
-    var query_string = '?' + EncodeQueryData(options);
-
-    return this.call('DELETE', '/series/' + query_string, null, callback);
+    return this.call('DELETE', '/series/', options, null, callback);
 }
 
 TempoDBClient.prototype.update_series = function(series_id, series_key, name, attributes, tags, callback) {
@@ -158,7 +159,7 @@ TempoDBClient.prototype.update_series = function(series_id, series_key, name, at
         tags: tags
     }
 
-    return this.call('PUT', '/series/id/' + series_id + '/', data, callback);
+    return this.call('PUT', '/series/id/' + series_id + '/', null, data, callback);
 }
 
 TempoDBClient.prototype.read = function(start, end, options, callback) {
@@ -173,9 +174,8 @@ TempoDBClient.prototype.read = function(start, end, options, callback) {
     options = options || {};
     options.start = ISODateString(start);
     options.end = ISODateString(end);
-    var query_string = '?' + EncodeQueryData(options);
 
-    return this.call('GET', '/data/' + query_string, null, callback);
+    return this.call('GET', '/data/', options, null, callback);
 };
 
 TempoDBClient.prototype.read_id = function(series_id, start, end, options, callback) {
@@ -188,9 +188,8 @@ TempoDBClient.prototype.read_id = function(series_id, start, end, options, callb
     options = options || {};
     options.start = ISODateString(start);
     options.end = ISODateString(end);
-    var query_string = '?' + EncodeQueryData(options);
 
-    return this.call('GET', '/series/id/' + series_id + '/data/' + query_string, null, callback);
+    return this.call('GET', '/series/id/' + series_id + '/data/', options, null, callback);
 }
 
 TempoDBClient.prototype.read_key = function(series_key, start, end, options, callback) {
@@ -203,17 +202,16 @@ TempoDBClient.prototype.read_key = function(series_key, start, end, options, cal
     options = options || {};
     options.start = ISODateString(start);
     options.end = ISODateString(end);
-    var query_string = '?' + EncodeQueryData(options);
 
-    return this.call('GET', '/series/key/' + series_key + '/data/' + query_string, null, callback);
+    return this.call('GET', '/series/key/' + series_key + '/data/', options, null, callback);
 }
 
 TempoDBClient.prototype.write_id = function(series_id, data, callback) {
-    return this.call('POST', '/series/id/' + series_id + '/data/', data, callback);
+    return this.call('POST', '/series/id/' + series_id + '/data/', null, data, callback);
 }
 
 TempoDBClient.prototype.write_key = function(series_key, data, callback) {
-    return this.call('POST', '/series/key/' + series_key + '/data/', data, callback);
+    return this.call('POST', '/series/key/' + series_key + '/data/', null, data, callback);
 }
 
 TempoDBClient.prototype.write_bulk = function(ts, data, callback) {
@@ -222,23 +220,23 @@ TempoDBClient.prototype.write_bulk = function(ts, data, callback) {
         data: data
     }
 
-    return this.call('POST', '/data/', body, callback);
+    return this.call('POST', '/data/', null, body, callback);
 }
 
 TempoDBClient.prototype.write_multi = function(data, callback) {
-    return this.call('POST', '/multi/', data, callback)
+    return this.call('POST', '/multi/', null, data, callback)
 }
 
 TempoDBClient.prototype.increment_multi = function(data, callback) {
-    return this.call('POST', '/multi/increment/', data, callback)
+    return this.call('POST', '/multi/increment/', null, data, callback)
 }
 
 TempoDBClient.prototype.increment_id = function(series_id, data, callback) {
-    return this.call('POST', '/series/id/' + series_id + '/increment/', data, callback);
+    return this.call('POST', '/series/id/' + series_id + '/increment/', null, data, callback);
 }
 
 TempoDBClient.prototype.increment_key = function(series_key, data, callback) {
-    return this.call('POST', '/series/key/' + series_key + '/increment/', data, callback);
+    return this.call('POST', '/series/key/' + series_key + '/increment/', null, data, callback);
 }
 
 TempoDBClient.prototype.increment_bulk = function(ts, data, callback) {
@@ -247,7 +245,7 @@ TempoDBClient.prototype.increment_bulk = function(ts, data, callback) {
         data: data
     }
 
-    return this.call('POST', '/increment/', body, callback);
+    return this.call('POST', '/increment/', null, body, callback);
 }
 
 TempoDBClient.prototype.delete_id = function(series_id, start, end, callback) {
@@ -255,9 +253,8 @@ TempoDBClient.prototype.delete_id = function(series_id, start, end, callback) {
     start: ISODateString(start),
     end:   ISODateString(end)
   }
-  var query_string = '?' + EncodeQueryData(options);
 
-  return this.call('DELETE', '/series/id/'+series_id+'/data/'+query_string, null, callback);
+  return this.call('DELETE', '/series/id/'+series_id+'/data/', options, null, callback);
 }
 
 TempoDBClient.prototype.delete_key = function(series_key, start, end, callback) {
@@ -266,9 +263,7 @@ TempoDBClient.prototype.delete_key = function(series_key, start, end, callback) 
     end:   ISODateString(end)
   }
 
-  var query_string = '?' + EncodeQueryData(options);
-
-  return this.call('DELETE', '/series/key/'+series_key+'/data/'+query_string, null, callback);
+  return this.call('DELETE', '/series/key/'+series_key+'/data/', options, null, callback);
 }
 
 
