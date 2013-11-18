@@ -573,7 +573,7 @@ An Object containing the series object and the datapoint.
         },
         data: { t: '2012-01-01T00:00:00.000+0000', v: 23.559637793913357 }
     }
-    
+
 Note: the data field will be null if no datapoint was found.
 
 ## Example
@@ -584,7 +584,7 @@ Note: the data field will be null if no datapoint was found.
 
     var series_id = '6fefeba655504694b21235acf8cdae5f';
     var ts = new Date('2012-01-01');
-    
+
     var options = {
         direction: 'nearest'
     }
@@ -620,7 +620,7 @@ An Object containing the series object and the datapoint.
         },
         data: { t: '2012-01-01T00:00:00.000+0000', v: 23.559637793913357 }
     }
-    
+
 Note: the data field will be null if no datapoint was found.
 
 ## Example
@@ -631,13 +631,13 @@ Note: the data field will be null if no datapoint was found.
 
     var series_key = 'your-custom-key';
     var ts = new Date('2012-01-01');
-    
+
     var options = {
         direction: 'before'
     }
 
     tempodb.single_value_by_key(series_key, ts, options, cb);
-    
+
 
 ## TempoDBClient#single_value(*ts*, *options*, *callback*)
 Requests a single value for all the series specified by the filter criteria. This will return a datapoint exactly determined by the supplied timestamp (ts) or this function can also search for datapoints.
@@ -680,7 +680,7 @@ A list of Objects containing the series object and the datapoint.
         },
         data: { t: '2012-01-01T00:00:00.000+0000', v: 23.559637793913357 }
     }]
-    
+
 Note: the data field will be null if no datapoint was found.
 
 ## Example

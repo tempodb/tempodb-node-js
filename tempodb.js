@@ -228,8 +228,8 @@ TempoDBClient.prototype.single_value = function(ts, options, callback) {
             direction (Specify direction to search in)
             id (Array of ids or single id)
             key (Array of keys or single key)
-            tags (Array of tags)
-            attributes (Object of attributes)
+            tag (Array of tags)
+            attr (Object of attributes)
 
     */
     options = options || {};
