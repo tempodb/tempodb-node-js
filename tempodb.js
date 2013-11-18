@@ -209,17 +209,15 @@ TempoDBClient.prototype.read_key = function(series_key, start, end, options, cal
 TempoDBClient.prototype.single_value_by_id = function(series_id, ts, options, callback) {
   options = options || {};
   options.ts = ISODateString(ts);
-  var queryString = '?' + EncodeQueryData(options);
 
-  return this.call('GET', '/series/id/' + series_id + '/single/' + queryString, null, callback);
+  return this.call('GET', '/series/id/' + series_id + '/single/', options, null, callback);
 }
 
 TempoDBClient.prototype.single_value_by_key = function(series_key, ts, options, callback) {
   options = options || {};
   options.ts = ISODateString(ts);
-  var queryString = '?' + EncodeQueryData(options);
 
-  return this.call('GET', '/series/key/' + series_key + '/single/' + queryString, null, callback);
+  return this.call('GET', '/series/key/' + series_key + '/single/', options, null, callback);
 }
 
 TempoDBClient.prototype.single_value = function(ts, options, callback) {
@@ -234,9 +232,8 @@ TempoDBClient.prototype.single_value = function(ts, options, callback) {
     */
     options = options || {};
     options.ts = ISODateString(ts);
-    var query_string = '?' + EncodeQueryData(options);
 
-    return this.call('GET', '/single/' + query_string, null, callback);
+    return this.call('GET', '/single/', options, null, callback);
 };
 
 TempoDBClient.prototype.write_id = function(series_id, data, callback) {
