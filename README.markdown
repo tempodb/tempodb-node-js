@@ -545,6 +545,161 @@ The following example reads data for the series with id *your-custom-key* and re
     tempodb.read_key(series_key, series_start_date, series_end_date, options, cb);
 
 
+## TempoDBClient#single_value_by_id(*series_id*, *ts*, *options*, *callback*)
+Requests a single value for the series specified by id. This will return a datapoint exactly determined by the supplied timestamp (ts) or this function can also search for datapoints.
+
+### Parameters
+
+* series_id - id for the series to retrieve single value (string)
+* ts - the requested timestamp for a datapoint. (DateTime)
+* options - An object containing the following
+    * direction - the specified search direction (string). Options are:
+        * exact - returns the datapoint exactly at the timestamp (Default)
+        * before - returns the datapoint exactly at the timestamp or searches backwards in time for the next datapoint
+        * after - returns the datapoint exactly at the timestamp or searches forwards in time for the next datapoint
+        * nearest - returns the datapoint exactly at the timestamp or searches both backwards and forwards and returns the datapoint closest to the timestamp
+
+### Returns
+
+An Object containing the series object and the datapoint.
+
+    {
+        series: {
+            id: '6fefeba655504694b21235acf8cdae5f',
+            key: 'your-custom-key',
+            name: '',
+            attributes: {},
+            tags: []
+        },
+        data: { t: '2012-01-01T00:00:00.000+0000', v: 23.559637793913357 }
+    }
+
+Note: the data field will be null if no datapoint was found.
+
+## Example
+
+    var TempoDBClient = require('tempodb').TempoDBClient;
+    var tempodb = new TempoDBClient('your-api-key', 'your-api-secret');
+    var cb = function(result){ console.log(result.response+': '+ JSON.stringify(result.body)); }
+
+    var series_id = '6fefeba655504694b21235acf8cdae5f';
+    var ts = new Date('2012-01-01');
+
+    var options = {
+        direction: 'nearest'
+    }
+
+    tempodb.single_value_by_id(series_id, ts, options, cb);
+
+
+## TempoDBClient#single_value_by_key(*series_key*, *ts*, *options*, *callback*)
+Requests a single value for the series specified by key. This will return a datapoint exactly determined by the supplied timestamp (ts) or this function can also search for datapoints.
+
+### Parameters
+
+* series_key - key for the series to retrieve single value (string)
+* ts - the requested timestamp for a datapoint. (DateTime)
+* options - An object containing the following
+    * direction - the specified search direction (string). Options are:
+        * exact - returns the datapoint exactly at the timestamp (Default)
+        * before - returns the datapoint exactly at the timestamp or searches backwards in time for the next datapoint
+        * after - returns the datapoint exactly at the timestamp or searches forwards in time for the next datapoint
+        * nearest - returns the datapoint exactly at the timestamp or searches both backwards and forwards and returns the datapoint closest to the timestamp
+
+### Returns
+
+An Object containing the series object and the datapoint.
+
+    {
+        series: {
+            id: '6fefeba655504694b21235acf8cdae5f',
+            key: 'your-custom-key',
+            name: '',
+            attributes: {},
+            tags: []
+        },
+        data: { t: '2012-01-01T00:00:00.000+0000', v: 23.559637793913357 }
+    }
+
+Note: the data field will be null if no datapoint was found.
+
+## Example
+
+    var TempoDBClient = require('tempodb').TempoDBClient;
+    var tempodb = new TempoDBClient('your-api-key', 'your-api-secret');
+    var cb = function(result){ console.log(result.response+': '+ JSON.stringify(result.body)); }
+
+    var series_key = 'your-custom-key';
+    var ts = new Date('2012-01-01');
+
+    var options = {
+        direction: 'before'
+    }
+
+    tempodb.single_value_by_key(series_key, ts, options, cb);
+
+
+## TempoDBClient#single_value(*ts*, *options*, *callback*)
+Requests a single value for all the series specified by the filter criteria. This will return a datapoint exactly determined by the supplied timestamp (ts) or this function can also search for datapoints.
+
+### Parameters
+
+* ts - the requested timestamp for a datapoint. (DateTime)
+* options - An object containing the following
+    * id - an array of ids to include (Array of strings)
+    * key - an array of keys to include (Array of strings)
+    * tag - an array of tags to filter on. These tags are and'd together (Array of strings)
+    * attr - a object of key/value pairs to filter on. These attributes are and'd together. (Object)
+    * direction - the specified search direction (string). Options are:
+        * exact - returns the datapoint exactly at the timestamp (Default)
+        * before - returns the datapoint exactly at the timestamp or searches backwards in time for the next datapoint
+        * after - returns the datapoint exactly at the timestamp or searches forwards in time for the next datapoint
+        * nearest - returns the datapoint exactly at the timestamp or searches both backwards and forwards and returns the datapoint closest to the timestamp
+
+### Returns
+
+A list of Objects containing the series object and the datapoint.
+
+    [{
+        series: {
+            id: '38268c3b231f1266a392931e15e99231',
+            key: 'my-other-series',
+            name: '',
+            attributes: {},
+            tags: ['tag1', 'tag2']
+        },
+        data: { t: '2012-01-01T00:01:00.000+0000', v: 55.9613357 }
+    },
+    {
+        series: {
+            id: '6fefeba655504694b21235acf8cdae5f',
+            key: 'your-custom-key',
+            name: '',
+            attributes: {},
+            tags: ['tag1', 'tag2']
+        },
+        data: { t: '2012-01-01T00:00:00.000+0000', v: 23.559637793913357 }
+    }]
+
+Note: the data field will be null if no datapoint was found.
+
+## Example
+
+This example will return a list of single value responses for all series with both tags ("tag1", "tag2")
+
+    var TempoDBClient = require('tempodb').TempoDBClient;
+    var tempodb = new TempoDBClient('your-api-key', 'your-api-secret');
+    var cb = function(result){ console.log(result.response+': '+ JSON.stringify(result.body)); }
+
+    var ts = new Date('2012-01-01');
+    var options = {
+        tag = ["tag1", "tag2"],
+        direction: 'exactly'
+    }
+
+    tempodb.single_value(ts, options, cb);
+
+
 ## TempoDBClient#write_id(*series_id*, *data*, *callback*)
 Write datapoints to the specified series id.
 
