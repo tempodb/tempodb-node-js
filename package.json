@@ -1,7 +1,7 @@
 {
   "name": "tempodb",
   "description": "A Node.js client for TempoDB",
-  "version": "0.4.0",
+  "version": "0.5.0",
   "author": "Andrew J Cronk <andy@tempo-db.com>",
   "keywords": ["tempodb", "time-series", "database"],
   "main": "tempodb"
