@@ -1,7 +1,8 @@
 var httplink = require('http-link')
 
-function Cursor(response) {
+function Cursor(response, data) {
 	this.response = response;
+	this.data = data;
 	this.isDone = false;
 }
 
@@ -10,13 +11,13 @@ Cursor.prototype.next = function(callback) {
 		throw "cursor is exhausted";
 	}
 	var cursor = this;
-	this.response.data.then(function(dataObj) {
-		var n = dataObj['data'].shift();
+	this.data.then(function(dataObj) {
+		var n = dataObj.shift();
 		if (n === undefined) {
 			if (cursor.response.headers['link'] !== undefined) {
 				cursor.loadFromServer()
 				cursor.data.then(function(d) {
-					callback(d['data'].shift());
+					callback(d.shift());
 				});
 			} else {
 				this.isDone = true;
@@ -29,5 +30,6 @@ Cursor.prototype.next = function(callback) {
 
 Cursor.prototype.loadFromServer = function() {
 	var link = httplink.parse(this.headers['link']);
-	this.response = this.response.get(link);
+	this.response = this.response.session.get(link);
+	this.data = this.response.data['data']
 }

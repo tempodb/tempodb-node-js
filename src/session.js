@@ -77,7 +77,7 @@ Session.prototype.doRequest = function(method, path, queryParams, body, callback
                 }
             }
 
-            if (typeof callback != 'undefined') {
+            if (callback !== undefined) {
                 callback({
                     response: response,
                     body: result
@@ -87,7 +87,7 @@ Session.prototype.doRequest = function(method, path, queryParams, body, callback
     });
 
     req.on('error', function (error) {
-      if (typeof errback != 'undefined') {
+      if (errback !== undefined) {
          errback(error);
       	}
     });
