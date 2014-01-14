@@ -12,12 +12,12 @@ Cursor.prototype.next = function(callback) {
 	}
 	var cursor = this;
 	this.data.then(function(dataObj) {
-		var n = dataObj.shift();
+		var n = dataObj['data'].shift();
 		if (n === undefined) {
 			if (cursor.response.headers['link'] !== undefined) {
 				cursor.loadFromServer()
 				cursor.data.then(function(d) {
-					callback(d.shift());
+					callback(d['data'].shift());
 				});
 			} else {
 				this.isDone = true;

@@ -18,7 +18,7 @@ var Response = exports.Response = function(resp, body, session, cursored) {
 	this.session = session;
 
 	if (cursored === true) {
-		this.data['data'] = new Cursor(
+		this.data['data'] = new Cursor(this, this.data); 
 	}
 
 	if (this.status === 200) {

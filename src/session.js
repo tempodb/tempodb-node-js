@@ -1,6 +1,7 @@
 var http = require('http');
 var https = require('https');
 var zlib = require('zlib');
+var q = require('q');
 
 var Session = exports.Session = 
 	function(key, secret, options) {
@@ -53,6 +54,7 @@ Session.prototype.doRequest = function(method, path, queryParams, body, callback
         headers: this.headers
     };
 
+		var deferred = q.defer();
     var req = this.connection.request(options, function (res) {
         var data = '';
         var response = res.statusCode;
@@ -68,34 +70,30 @@ Session.prototype.doRequest = function(method, path, queryParams, body, callback
 
         res.addListener('end', function() {
             var result = '';
+						var respObj = new Response(res, data, this.session, false);
             if (data) {
                 if (response < 300) {
-                    result = JSON.parse(data);
+										deferred.resolve(respObj)
                 }
                 else {
-                    result = data;
+										deferred.reject(response)
                 }
-            }
-
-            if (callback !== undefined) {
-                callback({
-                    response: response,
-                    body: result
-                });
             }
         });
     });
 
     req.on('error', function (error) {
       if (errback !== undefined) {
-         errback(error);
-      	}
+				var respObj = new Response(res, data, this.session, false);
+				deferred.reject(respObj);
+      }
     });
 
     if (body) {
         req.write(json_body);
     }
     req.end();
+		deferred.promise.then(callback).fail(errback)
 }
 
 Session.prototype.get = function(path, params, body, callback, errback) {
