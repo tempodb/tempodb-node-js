@@ -31,7 +31,16 @@ var Session = exports.Session =
 
 	}
 
-Session.prototype.doRequest = function(method, path, queryParams, body, callback, errback) {
+Session.prototype.doRequest = function(method, path, queryParams, body, cursored, callback) {
+		var wrapped = function(resp) {
+			if (resp.status < 300) {
+				callback(null, resp)
+			} else {
+				callback(resp.json, resp)
+			}
+
+		}
+
     path = this.path + encodeURI(path);
     if(queryParams) {
         path += '?' + encodeQueryData(queryParams);
@@ -70,13 +79,13 @@ Session.prototype.doRequest = function(method, path, queryParams, body, callback
 
         res.addListener('end', function() {
             var result = '';
-						var respObj = new Response(res, data, this.session, false);
+						var respObj = new Response(res, data, this.session, cursored);
             if (data) {
                 if (response < 300) {
 										deferred.resolve(respObj)
                 }
                 else {
-										deferred.reject(response)
+										deferred.reject(respObj)
                 }
             }
         });
@@ -93,23 +102,23 @@ Session.prototype.doRequest = function(method, path, queryParams, body, callback
         req.write(json_body);
     }
     req.end();
-		deferred.promise.then(callback).fail(errback)
+		deferred.promise.then(wrapped).fail(wrapped)
 }
 
-Session.prototype.get = function(path, params, body, callback, errback) {
-	return this.doRequest('GET', path, params, null);
+Session.prototype.get = function(path, params, cursored, callback) {
+	return this.doRequest('GET', path, params, cursored, null, callback);
 }
 
-Session.prototype.post = function(path, params, body, callback, errback) {
-	return this.doRequest('POST', path, params, body);
+Session.prototype.post = function(path, params, body, callback) {
+	return this.doRequest('POST', path, params, false, body, callback);
 }
 
-Session.prototype.put = function(path, params, body, callback, errback) {
-	return this.doRequest('PUT', path, params, body);
+Session.prototype.put = function(path, params, body, callback) {
+	return this.doRequest('PUT', path, params, false, body, callback);
 }
 
-Session.prototype.delete = function(path, params, body, callback, errback) {
-	return this.doRequest('DELETE', path, params, null);
+Session.prototype.delete = function(path, params, callback) {
+	return this.doRequest('DELETE', path, params, false, null, callback);
 }
 
 var encodeQueryData = function(data) {
