@@ -112,7 +112,7 @@ exports.testCursorMap = function(test) {
 	def2.resolve(myResponse2);
 	session.get.returns(def2.promise);
 
-	cb = function(p) {
+	cb = function(err, p) {
 		return p[0].foo + 2;
 	}
 
