@@ -1,7 +1,7 @@
 var cursor = require('../lib/cursor')
 var q = require('q')
 var response = require('../lib/response')
-var mocks = require('./testmocks')
+var mocks = require('./mocks/testmocks')
 var sinon = require('sinon');
 var Fiber = require('fibers');
 
@@ -113,7 +113,6 @@ exports.testCursorMap = function(test) {
 	session.get.returns(def2.promise);
 
 	cb = function(p) {
-		console.log(p)
 		return p[0].foo + 2;
 	}
 
