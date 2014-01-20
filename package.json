@@ -4,7 +4,8 @@
   "version": "1.0.0",
   "author": "Aaron Brenzel <aaron.brenzel@tempo-db.com>",
   "keywords": ["tempodb", "time-series", "database"],
-  "main": "tempodb",
+	"files": ["lib"],
+  "main": "index",
 	"dependencies": {
 		"q": "*",
 		"http-link": "0.3.0",
