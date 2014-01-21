@@ -98,7 +98,7 @@ exports.testCursorPreservesOrder = function(test) {
 	}).run()
 }
 
-exports.testCursorMap = function(test) {
+exports.testCursorReadAll = function(test) {
 	var data1 = '{"data": [{"foo": 1}, {"foo": 2}]}'
 	var deta2 = '{"data": [{"foo": 3}, {"foo": 4}]}'
 	var arr = new Array();
@@ -116,6 +116,33 @@ exports.testCursorMap = function(test) {
 		return p[0].foo + 2;
 	}
 
-	var r = myResponse1.json['data'].map(cb);
+	var r = myResponse1.json['data'].readAll(cb);
+	test.done()
+}
+
+exports.testCursorMap = function(test) {
+	var data1 = '{"data": [{"foo": 1}, {"foo": 2}]}'
+	var deta2 = '{"data": [{"foo": 3}, {"foo": 4}]}'
+	var arr = new Array();
+
+	var session = new mocks.MockSession();
+	var resp1 = new mocks.MockHTTPResponse(200, {"link": '<next.html>; rel=next'}, data1);
+	var resp2 = new mocks.MockHTTPResponse(200, {}, deta2);
+	var myResponse1 = new response.Response(resp1, resp1.body, session, true);
+	var myResponse2 = new response.Response(resp2, resp2.body, session, false);
+	var def2 = q.defer();
+	def2.resolve(myResponse2);
+	session.get.returns(def2.promise);
+
+	cb = function(err, p) {
+		console.log(p)
+		return p.foo + 2;
+	}
+
+	finalcb = function(err, data) {
+		console.log(data);
+	}
+
+	var r = myResponse1.json['data'].map(cb, finalcb);
 	test.done()
 }
