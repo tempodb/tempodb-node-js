@@ -11,7 +11,7 @@
 		"http-link": "0.3.0",
 		"nodeunit": "0.8.2",
 		"sinon": "*",
-		"fiber": "*"
+		"fibers": "*"
 	}
 }
 
