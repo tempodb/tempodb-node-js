@@ -325,16 +325,13 @@ You can also retrieve raw data by specifying "raw" as the interval. The series t
 
 ### Parameters
 
+* series_key - the key of the series to read
 * start - start time for the query (Date)
 * end - end time for the query (Date)
 
 * options is an object containing any of the following
-    * interval - the rollup interval (string)
-    * function - the rollup folding function (string)
-    * id - an array of ids to include (array of strings)
-        * can also pass single string if only one id
-    * key - an array of keys to include (array of strings)
-        * can also pass single string if only one key
+    * rollup.interval - the rollup interval (string)
+    * rollup.fold - the rollup folding function (string)
     * tag - an array of tags to filter on. These tags are and'd together (array of strings)
     * attr - an object of attribute key/value pairs to filter on. These attributes are and'd together. (object)
 		* limit - how many datapoints to read in a single page (Integer)
@@ -398,6 +395,95 @@ The following example reads the list of series with key *your-custom-key* (shoul
     }
 
     tempodb.read(series_key, series_start_date, series_end_date, options, function(err, result){
+			var cursor = result.json.data;
+			cursor.readAll(function(err, datapoints) {
+        for (var i = 0; i < datapoints.length; i++) {
+            var dp = datapoints[i];
+            console.log(dp);
+        }
+			}
+    });
+
+## TempoDBClient#readMulti(*series_key*, *start*, *end*, *options*, *callback*)
+Gets multiple series and corresponding time series data between the specified start and end dates.  The optional interval parameter allows you to specify a rollup period. For example, "1hour" will roll the data up on the hour using the provided function. The function parameter specifies the folding function to use while rolling the data up. A rollup is selected automatically if no interval or function is given. The auto rollup interval is calculated by the total time range (end - start) as follows:
+
+* range <= 2 days - raw data is returned
+* range <= 30 days - data is rolled up on the hour
+* else - data is rolled up by the day
+
+Rollup intervals are specified by a number and a time period. For example, 1day or 5min. Supported time periods:
+
+* min
+* hour
+* day
+* month
+* year
+
+Supported rollup functions:
+
+* sum
+* max
+* min
+* avg or mean
+* stddev (standard deviation)
+* count
+* first
+* last
+
+You can also retrieve raw data by specifying "raw" as the interval. The series to query can be filtered using the remaining parameters.
+
+### Parameters
+
+* start - start time for the query (Date)
+* end - end time for the query (Date)
+
+* options is an object containing any of the following
+    * rollup.interval - the rollup interval (string)
+    * rollup.fold - the rollup folding function (string)
+    * key - an array of keys to include (array of strings)
+        * can also pass single string if only one key
+    * tag - an array of tags to filter on. These tags are and'd together (array of strings)
+    * attr - an object of attribute key/value pairs to filter on. These attributes are and'd together. (object)
+		* limit - how many datapoints to read in a single page (Integer)
+    * tz - desired output timezone (string).  [View valid timezones](http://tempo-db.com/docs/api/timezone/).
+
+### Returns
+
+An object containing the series information, the accumulated time series data for each point of each series (any series not having data at a particular timestamp will be omitted from that timestamp), and a summary of statistics for the specified time period.
+  {
+		"data":[                                                                
+			{"t":"2012-03-27T03:00:00.000Z","v":{"foo":1.125, "bar":1.341}},                  
+			{"t":"2012-03-28T03:00:00.000Z","v":{"foo":2.125, "bar":3.121}}                   
+			{"t":"2012-03-28T03:00:00.000Z","v":{"bar":3.121}}                   
+		],                                                                      
+		"series":[                                                              
+			{"id":"123efac6b543a2901","key":"foo","name":"","tags":[],"attributes":{}}          
+			{"id":"934cab33e8f1a472b","key":"bar","name":"","tags":[],"attributes":{}}          
+		],                                                                      
+		"rollup":null,                                                          
+		"tz":"UTC"                                                              
+	}
+
+### Example
+
+The following example reads the list of series with key *your-custom-key* (should only be one) and returns the data rolled up to an hourly average.
+
+    var TempoDBClient = require('tempodb').TempoDBClient;
+    var tempodb = new TempoDBClient('your-api-key', 'your-api-secret');
+    var cb = function(err, result){ console.log(result.response+': '+ JSON.stringify(result.json)); }
+
+    var series_key = 'your-custom-key';
+    series_start_date = new Date('2012-01-01');
+    series_end_date = new Date('2012-01-02');
+
+    var options = {
+			  key: ['foo', 'bar'],
+        interval: '1hour',
+        'function': 'mean',
+        tz: 'America/Chicago'
+    }
+
+    tempodb.readMulti(series_start_date, series_end_date, options, function(err, result){
 			var cursor = result.json.data;
 			cursor.readAll(function(err, datapoints) {
         for (var i = 0; i < datapoints.length; i++) {
