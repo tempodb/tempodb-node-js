@@ -86,7 +86,7 @@ The return types below show what is returned in the *body* parameter of successf
 
 ## Cursors
 
-Some endpoints (namely get_series and read) return Cursors (defined in *lib/cursor.js*) as the 'data' attribute in the json of the response.  Cursors represent paginated data, but can be used as if they represented all the data in the return call.  To work with the cursor, you can do this:
+Some endpoints (all those that return multiple values - read, readMulti, listSeries, and findByKey as of this release) return Cursors (defined in *lib/cursor.js*) as the 'data' attribute in the json of the response.  Cursors represent paginated data, but can be used as if they represented all the data in the return call.  To work with the cursor, you can do this:
 
 		Client.read('foo', function(err, resp) {
 			var cursor = resp.json['data'];
@@ -111,6 +111,9 @@ Map will call the first callback with each *point* of data until it reaches the 
 	});
 
 In this case, the final output of this call will be printing each datapoint to the console with its value incremented by 2.0.  You can use map when you need to run a final function that sees the total output of your read call.
+
+### Cursor.toArray(*callback*)
+Convert the cursor into an array of all the points returned and pass the into callback. *WARNING*: this will construct an array of every point in the range of the query in memory.  For large queries, you could run out of memory.
 
 ## TempoDBClient#createSeries(*key*, *callback*)
 Creates a new series with an optionally specified key.  If no key is given, only the system generated id is returned.
