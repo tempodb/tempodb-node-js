@@ -58,7 +58,7 @@ For backwards compatibility purposes, each method has both an _ separated and ca
 	Client.write_multi
 	Client.writeMulti
 
-These can be used interchangeably, even though the documentation below reflects the _ style.
+These can be used interchangeably, even though the documentation below reflects the camelCase style.
 
 ## Callbacks and returned Objects
 Most of the API functions allow you to pass in an optional *callback* function.  In general, the callback should be a function accepting
@@ -112,7 +112,7 @@ Map will call the first callback with each *point* of data until it reaches the 
 
 In this case, the final output of this call will be printing each datapoint to the console with its value incremented by 2.0.  You can use map when you need to run a final function that sees the total output of your read call.
 
-## TempoDBClient#create_series(*key*, *callback*)
+## TempoDBClient#createSeries(*key*, *callback*)
 Creates a new series with an optionally specified key.  If no key is given, only the system generated id is returned.
 
 ### Parameters
@@ -139,20 +139,20 @@ The following example creates two series: one with a given key of "my-custom-key
 
     var series1, series2;
 
-    tempodb.create_series('my-custom-key'), function(err, result) {
+    tempodb.createSeries('my-custom-key'), function(err, result) {
         if (result.status == 200) {
             series1 = result.json;
         }
     });
 
-    tempodb.create_series(null, function(result) {
+    tempodb.createSeries(null, function(result) {
         if (result.status == 200) {
             series2 = result.json;
         }
     });
 
 
-## TempoDBClient#get_series(*options*, *callback*)
+## TempoDBClient#getSeries(*options*, *callback*)
 Gets a list of series objects, optionally filtered by the provided parameters. Series can be filtered by id, key, tag and
 attribute.
 
@@ -199,7 +199,7 @@ The following example returns all series with tags "tag1" and "tag2" and attribu
         attr: { attr1: 'value1'}
     }
 
-    tempodb.get_series(options, function(err, result){
+    tempodb.getSeries(options, function(err, result){
         if (result.status == 200) {
             var series_list = result.json['data'];
 
@@ -213,7 +213,7 @@ The following example returns all series with tags "tag1" and "tag2" and attribu
     });
 
 
-## TempoDBClient#update_series(*series_id*, *series_key*, *name*, *attributes*, *tags*, *callback*)
+## TempoDBClient#updateSeries(*series_id*, *series_key*, *name*, *attributes*, *tags*, *callback*)
 Updates a series.  Currently, only tags and attributes can be modified. The easiest way to use this method is through a read-modify-write cycle.
 
 ### Parameters
@@ -247,7 +247,7 @@ The following example reads the list of series with key *test1* (should only be 
         key: 'test1'
     }
 
-    tempodb.get_series(options, function(err, result) {
+    tempodb.getSeries(options, function(err, result) {
         if (result.status == 200) {
             var series = result.json[0];
             var new_tags = ['foo', 'bar'];
@@ -256,7 +256,7 @@ The following example reads the list of series with key *test1* (should only be 
         }
     });
 
-## TempoDBClient#delete_series(*options*, callback)
+## TempoDBClient#deleteSeries(*options*, callback)
 Delete series objects by the given filter criteria.
 This method has the same query parameters as `get_series`. Series can be
 deleted by id, key, tag and attribute. You must specify at least one filter
@@ -293,7 +293,7 @@ The following example deletes all series with "tag1" and "tag2" and attribute "a
       }
     };
 
-    tempodb.delete_series(options, cb);
+    tempodb.deleteSeries(options, cb);
 
 ## TempoDBClient#read(*series_key*, *start*, *end*, *options*, *callback*)
 Gets one series and corresponding time series data between the specified start and end dates.  The optional interval parameter allows you to specify a rollup period. For example, "1hour" will roll the data up on the hour using the provided function. The function parameter specifies the folding function to use while rolling the data up. A rollup is selected automatically if no interval or function is given. The auto rollup interval is calculated by the total time range (end - start) as follows:
@@ -466,7 +466,7 @@ An object containing the series information, the accumulated time series data fo
 
 ### Example
 
-The following example reads the list of series with key *your-custom-key* (should only be one) and returns the data rolled up to an hourly average.
+The following example reads the list of series with keys *foo* and *bar* and returns the data rolled up to an hourly average.
 
     var TempoDBClient = require('tempodb').TempoDBClient;
     var tempodb = new TempoDBClient('your-api-key', 'your-api-secret');
@@ -494,8 +494,93 @@ The following example reads the list of series with key *your-custom-key* (shoul
     });
 
 
+## TempoDBClient#findByKey(*series_key*, *start*, *end*, *options*, *callback*)
+Supports finding datapoints within a specified interval between the start and end point of the query.  Supported find functions are:
 
-## TempoDBClient#single_value_by_key(*series_key*, *ts*, *options*, *callback*)
+* max
+* min
+* first
+* last
+
+The find period can be any valid ISO period.  
+
+### Parameters
+
+* start - start time for the query (Date)
+* end - end time for the query (Date)
+
+* options is an object containing any of the following
+    * predicate.period - the period to search within (string)
+    * predicate.function - the finding function (string)
+		* limit - how many datapoints to read in a single page (Integer)
+    * tz - desired output timezone (string).  [View valid timezones](http://tempo-db.com/docs/api/timezone/).
+
+### Returns
+
+An object containing the information on the located datapoints, 
+
+  {
+		"data":[                                                                
+      {
+        "interval": {
+          "start": "2012-03-27T00:00:00.000Z",
+          "end": "2012-03-28T00:00:00.000Z"
+        },
+        "found": {
+          "t": "2012-03-27T04:14:22.000Z",
+          "v": 2.3
+        }
+      },
+      {
+        "interval": {
+          "start": "2012-03-28T00:00:00.000Z",
+          "end": "2012-03-29T00:00:00.000Z"
+        },
+        "found": {
+          "t": "2012-03-28T015:02:59.000Z",
+          "v": 8.1
+        }
+      }
+		],                                                                      
+		"predicate": {
+      "function": "max",
+      "period": "PT1H"
+    },                                                          
+		"tz":"UTC"                                                              
+	}
+
+### Example
+
+The following example finds the maximum datapoint within each hour for a day.
+
+
+    var TempoDBClient = require('tempodb').TempoDBClient;
+    var tempodb = new TempoDBClient('your-api-key', 'your-api-secret');
+    var cb = function(err, result){ console.log(result.response+': '+ JSON.stringify(result.json)); }
+
+    series_key = 'my-series'
+    series_start_date = new Date('2012-01-01');
+    series_end_date = new Date('2012-01-02');
+
+    var options = {
+			  key: ['foo', 'bar'],
+        interval: '1hour',
+        'predicate.function': 'max',
+        'predicate.period': '1hour',
+        tz: 'America/Chicago'
+    }
+
+    tempodb.findByKey(series_key, series_start_date, series_end_date, options, function(err, result){
+			var cursor = result.json.data;
+			cursor.readAll(function(err, datapoints) {
+        for (var i = 0; i < datapoints.length; i++) {
+            var dp = datapoints[i];
+            console.log(dp);
+        }
+			}
+    });
+
+## TempoDBClient#singleValueByKey(*series_key*, *ts*, *options*, *callback*)
 Requests a single value for the series specified by key. This will return a datapoint exactly determined by the supplied timestamp (ts) or this function can also search for datapoints.
 
 ### Parameters
@@ -539,10 +624,10 @@ Note: the data field will be null if no datapoint was found.
         direction: 'before'
     }
 
-    tempodb.single_value_by_key(series_key, ts, options, cb);
+    tempodb.singleValueByKey(series_key, ts, options, cb);
 
 
-## TempoDBClient#single_value(*ts*, *options*, *callback*)
+## TempoDBClient#singleValue(*ts*, *options*, *callback*)
 Requests a single value for all the series specified by the filter criteria. This will return a datapoint exactly determined by the supplied timestamp (ts) or this function can also search for datapoints.
 
 ### Parameters
@@ -600,10 +685,10 @@ This example will return a list of single value responses for all series with bo
         direction: 'exactly'
     }
 
-    tempodb.single_value(ts, options, cb);
+    tempodb.singleValue(ts, options, cb);
 
 
-## TempoDBClient#write_key(*series_key*, *data*, *callback*)
+## TempoDBClient#writeKey(*series_key*, *data*, *callback*)
 Write datapoints to the specified series key.
 
 ### Parameters
@@ -631,10 +716,10 @@ The following example writes three datapoints to the series with key *your-custo
         { t: new Date("2012-01-12 14:13:00"), v: 49.856 }
     ];
 
-    tempodb.write_key(series_key, data, cb);
+    tempodb.writeKey(series_key, data, cb);
 
 
-## TempoDBClient#write_bulk(*ts*, *data*, *callback*)
+## TempoDBClient#writeBulk(*ts*, *data*, *callback*)
 Write datapoints to multiple series for a single timestamp.  This function takes a timestamp and a parameter called data which is an Array of Objects containing either the series id or series key and the value.  For example:
 
     data = [
@@ -672,10 +757,10 @@ The following example writes 5 separate series at the same timestamp.
         { id: "38268c3b231f1266a392931e15e99231", v: 9912.75 },
     ];
 
-    tempodb.write_bulk(ts, data, cb);
+    tempodb.writeBulk(ts, data, cb);
 
 
-## TempoDBClient#write_multi(*data*, *callback*)
+## TempoDBClient#writeMulti(*data*, *callback*)
 Write datapoints to multiple series for multiple timestamps. This function takes an Array of Objects containing the timestamp, either the series id or series key, and the value.  For example:
 
     data = [
@@ -731,11 +816,11 @@ The following example writes 5 separate series at the same timestamp.
         { t: new Date("2012-01-12 14:13:00"), id: "38268c3b231f1266a392931e15e99231", v: 9912.75 }
     ];
 
-    tempodb.write_multi(data, cb);
+    tempodb.writeMulti(data, cb);
 
 
 
-## TempoDBClient#delete_key(*series_key*, *start*, *end*, *callback*)
+## TempoDBClient#deleteKey(*series_key*, *start*, *end*, *callback*)
 Deletes a range of data from a series referenced by key between the specified start and end dates. As with the read api, the start is inclusive and the end date is exclusive. \[start, end)
 
 ### Parameters
@@ -760,4 +845,4 @@ The following example deletes data for the series with key *your-custom-key* bet
     series_start_date = new Date('2012-01-01');
     series_end_date = new Date('2012-01-14');
 
-    tempodb.delete_key(series_key, series_start_date, series_end_date, cb);
+    tempodb.deleteKey(series_key, series_start_date, series_end_date, cb);
