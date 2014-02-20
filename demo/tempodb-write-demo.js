@@ -1,7 +1,7 @@
 /* http://tempo-db.com/api/write-series/#write-series-by-key */
 
 var TempoDBClient = require('../lib/tempodb').TempoDBClient;
-var tempodb = new TempoDBClient('my-api-key', 'my-api-secret');
+var tempodb = new TempoDBClient('my-key', 'my-secret');
 
 const MINUTES_IN_DAY = 1440;
 const MS_IN_DAY = 86400000;
@@ -9,7 +9,7 @@ const MS_IN_MIN = 60000;
 
 /* update to one of your series_key */
 /* if you write to a key that doesn't yet exist, it will create it for you */
-var series_key = 'my-series-key';
+var series_key = 'stuff2';
 var series_start_date = new Date('2012-01-01');
 
 // loop through 10 days, and add 1 data point per minute of that day
