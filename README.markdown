@@ -155,7 +155,7 @@ The following example creates two series: one with a given key of "my-custom-key
     });
 
 
-## TempoDBClient#getSeries(*options*, *callback*)
+## TempoDBClient#getSeries(*options*, *callback*) *CURSORED ENDPOINT*
 Gets a list of series objects, optionally filtered by the provided parameters. Series can be filtered by id, key, tag and
 attribute.
 
@@ -298,7 +298,7 @@ The following example deletes all series with "tag1" and "tag2" and attribute "a
 
     tempodb.deleteSeries(options, cb);
 
-## TempoDBClient#read(*series_key*, *start*, *end*, *options*, *callback*)
+## TempoDBClient#read(*series_key*, *start*, *end*, *options*, *callback*) *CURSORED ENDPOINT*
 Gets one series and corresponding time series data between the specified start and end dates.  The optional interval parameter allows you to specify a rollup period. For example, "1hour" will roll the data up on the hour using the provided function. The function parameter specifies the folding function to use while rolling the data up. A rollup is selected automatically if no interval or function is given. The auto rollup interval is calculated by the total time range (end - start) as follows:
 
 * range <= 2 days - raw data is returned
@@ -407,7 +407,7 @@ The following example reads the list of series with key *your-custom-key* (shoul
 			}
     });
 
-## TempoDBClient#readMulti(*series_key*, *start*, *end*, *options*, *callback*)
+## TempoDBClient#readMulti(*series_key*, *start*, *end*, *options*, *callback*) *CURSORED ENDPOINT*
 Gets multiple series and corresponding time series data between the specified start and end dates.  The optional interval parameter allows you to specify a rollup period. For example, "1hour" will roll the data up on the hour using the provided function. The function parameter specifies the folding function to use while rolling the data up. A rollup is selected automatically if no interval or function is given. The auto rollup interval is calculated by the total time range (end - start) as follows:
 
 * range <= 2 days - raw data is returned
@@ -497,7 +497,7 @@ The following example reads the list of series with keys *foo* and *bar* and ret
     });
 
 
-## TempoDBClient#findByKey(*series_key*, *start*, *end*, *options*, *callback*)
+## TempoDBClient#findByKey(*series_key*, *start*, *end*, *options*, *callback*) *CURSORED ENDPOINT*
 Supports finding datapoints within a specified interval between the start and end point of the query.  Supported find functions are:
 
 * max
