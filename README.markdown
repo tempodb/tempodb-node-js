@@ -354,8 +354,6 @@ An object containing the series information, time series data, and a summary of 
                 attributes: {},
                 tags: []
             },
-            start: '2012-01-01T00:00:00.000+0000',
-            end: '2012-01-02T00:00:00.000+0000',
             data: [
                 { t: '2012-01-01T00:00:00.000+0000', v: 23.559637793913357 },
                 { t: '2012-01-01T01:00:00.000+0000', v: 24.887018265425514 },
@@ -367,15 +365,6 @@ An object containing the series information, time series data, and a summary of 
                 interval: 1hour,
                 'function': 'mean',
                 'tz': 'America/Chicago'
-            },
-            summary: {
-                sum: 35680.95450980151,
-                mean: 24.778440631806603,
-                max: 49.96850016748075,
-                min: 0.057467774982028486,
-                stddev: 14.356117758209086,
-                ss: 296575.1904890079,
-                count: 1440
             }
          }
 
