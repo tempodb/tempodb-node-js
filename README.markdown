@@ -323,6 +323,7 @@ Supported rollup functions:
 * count
 * first
 * last
+* percentile
 
 You can also retrieve raw data by specifying "raw" as the interval. The series to query can be filtered using the remaining parameters.
 
@@ -396,6 +397,54 @@ The following example reads the list of series with key *your-custom-key* (shoul
 			}
     });
 
+## TempoDBClient#getSummary(*series_key*, *start*, *end*, *callback*)
+Gets a summary a data for the given series over the desired time period.
+
+### Returns
+
+An object containing the series information, time series data, and a summary of statistics for the specified time period.
+
+        {
+            series: {
+                id: '6fefeba655504694b21235acf8cdae5f',
+                key: 'your-custom-key',
+                name: '',
+                attributes: {},
+                tags: []
+            },
+              tz: 'UTC',
+              end: '2012-01-02T00:00:00.000Z',
+              start: '2012-01-01T00:00:00.000Z',
+              summary: 
+                { count: 1440,
+                  mean: 24.78802922652297,
+                  min: 0.03275709459558129,
+                  max: 49.95655614184216,
+                  stddev: 14.361505725497977,
+                  sum: 35694.76208619308 } 
+         }
+
+### Example
+
+The following example gets the summary for one day of the series 'your-custom-key'
+
+    var TempoDBClient = require('tempodb').TempoDBClient;
+    var tempodb = new TempoDBClient('your-api-key', 'your-api-secret');
+
+    var series_key = 'your-custom-key';
+    series_start_date = new Date('2012-01-01');
+    series_end_date = new Date('2012-01-02');
+
+    var options = {
+        interval: '1hour',
+        'function': 'mean',
+        tz: 'America/Chicago'
+    }
+
+    tempodb.read(series_key, series_start_date, series_end_date, function(err, result){
+      console.log(result.json);
+    });
+
 ## TempoDBClient#readMulti(*series_key*, *start*, *end*, *options*, *callback*) *CURSORED ENDPOINT*
 Gets multiple series and corresponding time series data between the specified start and end dates.  The optional interval parameter allows you to specify a rollup period. For example, "1hour" will roll the data up on the hour using the provided function. The function parameter specifies the folding function to use while rolling the data up. A rollup is selected automatically if no interval or function is given. The auto rollup interval is calculated by the total time range (end - start) as follows:
 
@@ -421,6 +470,7 @@ Supported rollup functions:
 * count
 * first
 * last
+* percentile
 
 You can also retrieve raw data by specifying "raw" as the interval. The series to query can be filtered using the remaining parameters.
 
@@ -484,6 +534,103 @@ The following example reads the list of series with keys *foo* and *bar* and ret
             console.log(dp);
         }
 			}
+    });
+
+
+## TempoDBClient#getMultiRollups(*series_key*, *start*, *end*, *options*, *callback*) *CURSORED ENDPOINT*
+Apply multiple rollup functions to a single series read.  The rollup functions used will all use the same period.
+
+Rollup intervals are specified by a number and a time period. For example, 1day or 5min. Supported time periods:
+
+* min
+* hour
+* day
+* month
+* year
+
+Supported rollup functions:
+
+* sum
+* max
+* min
+* avg or mean
+* stddev (standard deviation)
+* count
+* first
+* last
+* percentile
+
+You can also retrieve raw data by specifying "raw" as the interval. The series to query can be filtered using the remaining parameters.
+
+### Parameters
+
+* start - start time for the query (Date)
+* end - end time for the query (Date)
+
+* options is an object containing any of the following
+    * rollup.period - the rollup interval (string)
+    * rollup.fold - an array of rollup folding functions (string)
+    * key - an array of keys to include (array of strings)
+        * can also pass single string if only one key
+    * tag - an array of tags to filter on. These tags are and'd together (array of strings)
+    * attr - an object of attribute key/value pairs to filter on. These attributes are and'd together. (object)
+		* limit - how many datapoints to read in a single page (Integer)
+    * tz - desired output timezone (string).  [View valid timezones](http://tempo-db.com/docs/api/timezone/).
+
+### Returns
+
+An object containing the series information, the accumulated time series data for each point of each series (any series not having data at a particular timestamp will be omitted from that timestamp), and a summary of statistics for the specified time period.
+
+  {
+		"data":[                                                                
+      { t: '2012-01-01T04:00:00.000Z', v: { count: 60, max: 49.84126889814867, min: 1.1116998714582937, percentile: 8.407472817470296 } },
+      { t: '2012-01-01T05:00:00.000Z', v: { count: 60, max: 49.84126889814867, min: 1.1116998714582937, percentile: 8.407472817470296 } },
+      ...
+		],                                                                      
+		"series":[                                                              
+			{"id":"934cab33e8f1a472b","key":"bar","name":"","tags":[],"attributes":{}}          
+		],                                                                      
+		"rollup": { period: 'PT1H',
+        folds: [ 'count', 'max', 'min', 'percentile(0.2)' ] },
+		"tz":"UTC"                                                              
+	}
+
+### Example
+
+The following example reads the list of series with keys *foo* and *bar* and returns the data rolled up to an hourly average.
+
+    var TempoDBClient = require('../lib/tempodb').TempoDBClient;
+    var tempodb = new TempoDBClient('my-key, 'my-secret')
+
+    var series_key = 'stuff',
+	    series_start_date = new Date('2012-01-01'),
+	    series_end_date = new Date('2012-01-02');
+
+    // read a date range
+    var options = {
+	    'rollup.period': '1hour',
+      'rollup.fold': ['count', 'max', 'min', 'percentile,20'],
+	    limit: 1000
+   }
+  var count = 0
+
+var start_time = new Date();
+tempodb.getMultiRollups(series_key, series_start_date, series_end_date, options, function(err, result){
+	    if (err) {
+		    console.log(err);
+		    console.log('Status code: ' + err.status);
+		    console.log('Error: ' + err.json);
+	    } else {
+        console.log(result.json)
+		    result.json.data.toArray(function(err, dps) {
+			    if (err) { 
+				    console.log('There was an error')
+			    } else {
+            console.log(dps);
+				    console.log('Total points: ' + dps.length);
+			    }
+		    });
+    	}
     });
 
 
