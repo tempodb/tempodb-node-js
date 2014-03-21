@@ -333,7 +333,7 @@ You can also retrieve raw data by specifying "raw" as the interval. The series t
 * end - end time for the query (Date)
 
 * options is an object containing any of the following
-    * rollup.interval - the rollup interval (string)
+    * rollup.period - the rollup interval (string)
     * rollup.fold - the rollup folding function (string)
     * tag - an array of tags to filter on. These tags are and'd together (array of strings)
     * attr - an object of attribute key/value pairs to filter on. These attributes are and'd together. (object)
@@ -430,7 +430,7 @@ You can also retrieve raw data by specifying "raw" as the interval. The series t
 * end - end time for the query (Date)
 
 * options is an object containing any of the following
-    * rollup.interval - the rollup interval (string)
+    * rollup.period - the rollup interval (string)
     * rollup.fold - the rollup folding function (string)
     * key - an array of keys to include (array of strings)
         * can also pass single string if only one key
