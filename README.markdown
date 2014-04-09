@@ -521,8 +521,8 @@ The following example reads the list of series with keys *foo* and *bar* and ret
 
     var options = {
 			  key: ['foo', 'bar'],
-        interval: '1hour',
-        'function': 'mean',
+        'rollup.period': '1hour',
+        'rollup.fold': 'mean',
         tz: 'America/Chicago'
     }
 
@@ -537,6 +537,66 @@ The following example reads the list of series with keys *foo* and *bar* and ret
     });
 
 
+## TempoDBClient#aggregate(*start*, *end*, *aggregation*, *options*, *callback*) *CURSORED ENDPOINT*
+Aggregates data from multiple series into a single series according to an aggregation function.  The returned series can be thought of as a "virtual" or "temporary"
+series composed of data from a larger set of series.
+
+### Parameters
+
+* start - start time for the query (Date)
+* end - end time for the query (Date)
+* aggregation - the aggregation function (all valid rollup functions are valid aggregation functions)
+
+* options is an object containing any of the following
+    * rollup.period - the rollup interval (string)
+    * rollup.fold - the rollup folding function (string)
+    * key - an array of keys to include (array of strings)
+        * can also pass single string if only one key
+    * tag - an array of tags to filter on. These tags are and'd together (array of strings)
+    * attr - an object of attribute key/value pairs to filter on. These attributes are and'd together. (object)
+		* limit - how many datapoints to read in a single page (Integer)
+    * tz - desired output timezone (string).  [View valid timezones](http://tempo-db.com/docs/api/timezone/).
+
+### Returns
+
+An object containing the series information, the accumulated time series data for each point of each series (any series not having data at a particular timestamp will be omitted from that timestamp), and a summary of statistics for the specified time period.
+
+  {
+		"data":[                                                                
+			{"t":"2012-03-27T03:00:00.000Z","v":1.341},                  
+			{"t":"2012-03-28T03:00:00.000Z","v":3.121},                
+			{"t":"2012-03-29T03:00:00.000Z","v":5.21}                  
+		],                                                                      
+		"rollup":null,                                                          
+		"tz":"UTC"                                                              
+	}
+
+### Example
+
+The following example reads the list of series with keys *foo* and *bar* and returns the data rolled up to an hourly average.
+
+    var TempoDBClient = require('tempodb').TempoDBClient;
+    var tempodb = new TempoDBClient('your-api-key', 'your-api-secret');
+    var cb = function(err, result){ console.log(result.response+': '+ JSON.stringify(result.json)); }
+
+    var series_key = 'your-custom-key';
+    series_start_date = new Date('2012-01-01');
+    series_end_date = new Date('2012-01-02');
+
+    var options = {
+			  key: ['foo', 'bar'],
+        tz: 'America/Chicago'
+    }
+
+    tempodb.aggregate(series_start_date, series_end_date, "sum", options, function(err, result){
+			var cursor = result.json.data;
+			cursor.readAll(function(err, datapoints) {
+        for (var i = 0; i < datapoints.length; i++) {
+            var dp = datapoints[i];
+            console.log(dp);
+        }
+			}
+    });
 ## TempoDBClient#getMultiRollups(*series_key*, *start*, *end*, *options*, *callback*) *CURSORED ENDPOINT*
 Apply multiple rollup functions to a single series read.  The rollup functions used will all use the same period.
 
