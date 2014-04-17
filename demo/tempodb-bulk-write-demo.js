@@ -1,7 +1,7 @@
 /* http://tempo-db.com/api/write-series/#bulk-write-multiple-series */
 
-var TempoDBClient = require('tempodb').TempoDBClient;
-var tempodb = new TempoDBClient('your-api-key', 'your-api-secret');
+var TempoDBClient = require('../lib/tempodb').TempoDBClient;
+var tempodb = new TempoDBClient('my-database-id', 'my-api-key', 'my-api-secret');
 
 var ts = new Date();
 

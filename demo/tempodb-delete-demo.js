@@ -1,6 +1,6 @@
 
 var TempoDBClient = require('tempodb').TempoDBClient;
-var tempodb = new TempoDBClient('your-api-key', 'your-api-secret');
+var tempodb = new TempoDBClient('my-database-id', 'your-api-key', 'your-api-secret');
 
 var series_key = 'your-custom-key'
 // Delete a day's worth of data

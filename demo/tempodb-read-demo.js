@@ -1,7 +1,7 @@
 /* http://tempo-db.com/api/read-series/#read-series-by-key */
 
 var TempoDBClient = require('../lib/tempodb').TempoDBClient;
-var tempodb = new TempoDBClient('my-key', 'my-secret');
+var tempodb = new TempoDBClient('my-database-id', 'my-key', 'my-secret');
 
 var series_key = 'stuff',
 	series_start_date = new Date('2012-01-01'),
@@ -11,9 +11,7 @@ var series_key = 'stuff',
 var options = {
 	interval: '1hour',
 	'function': 'mean',
-	limit: 1000,
-	'interpolation.function': 'linear',
-	'interpolation.period': '1hour'
+	limit: 1000
 }
 var count = 0
 
