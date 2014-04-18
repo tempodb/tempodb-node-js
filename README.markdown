@@ -35,10 +35,10 @@ The default hostname and port should work for the standard cluster.
 
 
     var TempoDBClient = require('tempodb').TempoDBClient;
-    var tempodb = new TempoDBClient('your-api-key', 'your-api-secret');
+    var tempodb = new TempoDBClient('your-database-id', 'your-api-key', 'your-api-secret');
 
 
-You can specify an optional third argument Object to TempoDBClient
+For now, the database ID and API key are the same value.  You can specify an optional four argument Object to TempoDBClient
 
     var tempodb = new TempoDBClient('your-api-key', 'your-api-secret', {hostname: 'your-host.name', port: 123});
 
