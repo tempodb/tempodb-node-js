@@ -827,7 +827,7 @@ Note: the data field will be null if no datapoint was found.
     tempodb.singleValueByKey(series_key, ts, options, cb);
 
 
-## TempoDBClient#singleValue(*ts*, *options*, *callback*)
+## TempoDBClient#singleValue(*ts*, *options*, *callback*) *CURSORED ENDPOINT*
 Requests a single value for all the series specified by the filter criteria. This will return a datapoint exactly determined by the supplied timestamp (ts) or this function can also search for datapoints.
 
 ### Parameters
