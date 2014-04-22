@@ -10,7 +10,7 @@ npm install tempodb
 
 1. After installing tempodb, download [tempodb-write-demo.js](https://github.com/tempodb/tempodb-node-js/blob/master/demo/tempodb-write-demo.js).
 
-1. Edit *your-api-key* and *your-api-secret* in tempodb-write-demo.js.
+1. Edit *your-database-id*, *your-api-key* and *your-api-secret* in tempodb-write-demo.js.
 
 1. Run tempodb-write-demo.js to insert 10 days worth of test data.
 
@@ -20,7 +20,7 @@ node tempodb-write-demo
 
 1. Download [tempodb-read-demo.js](https://github.com/tempodb/tempodb-node-js/blob/master/demo/tempodb-read-demo.js)
 
-1. Edit *your-api-key* and *your-api-secret* in tempodb-read-demo.js.
+1. Edit *your-database-id*, *your-api-key* and *your-api-secret* in tempodb-read-demo.js.
 
 1. Run tempodb-read-demo.js to read back the data you just wrote in.
 
