@@ -5,10 +5,8 @@ The TempoDB Node.js API Client makes calls to the [TempoDB API](http://tempo-db.
 1. Install tempodb
 
 ```
-npm install tempodb
+For now, the v1.0 release of the NodeJS TempoDB client must be obtained by cloning the Github repo (https://github.com/tempodb/tempodb-node-js) and installing locally.  Use the v1.0 branch when building.
 ```
-
-1. After installing tempodb, download [tempodb-write-demo.js](https://github.com/tempodb/tempodb-node-js/blob/master/demo/tempodb-write-demo.js).
 
 1. Edit *your-database-id*, *your-api-key* and *your-api-secret* in tempodb-write-demo.js.
 
@@ -155,7 +153,40 @@ The following example creates two series: one with a given key of "my-custom-key
     });
 
 
-## TempoDBClient#getSeries(*options*, *callback*) *CURSORED ENDPOINT*
+## TempoDBClient#getSeries(*key*, *callback*) 
+Gets a single series object, identified by key.
+
+### Parameters
+
+* key - an string key for the series to get
+
+### Returns
+A series object
+
+      {
+        "id":"6ee327867a9f45a5b4d9feb5601897ab",
+        "key":"Daily_Rainfall",
+        "name":"",
+        "attributes":{},
+        "tags":[]
+      }
+
+### Example
+
+The following example gets a single series with the key 'key1' 
+
+    var TempoDBClient = require('tempodb').TempoDBClient;
+    var tempodb = new TempoDBClient('your-api-key', 'your-api-secret');
+
+    tempodb.getSeries('key1', function(err, result){
+        if (result.status == 200) {
+            var series_list = result.json['data'];
+            console.log(result.json);
+        }
+    });
+
+
+## TempoDBClient#listSeries(*options*, *callback*) *CURSORED ENDPOINT*
 Gets a list of series objects, optionally filtered by the provided parameters. Series can be filtered by id, key, tag and
 attribute.
 
@@ -202,7 +233,7 @@ The following example returns all series with tags "tag1" and "tag2" and attribu
         attr: { attr1: 'value1'}
     }
 
-    tempodb.getSeries(options, function(err, result){
+    tempodb.listSeries(options, function(err, result){
         if (result.status == 200) {
             var series_list = result.json['data'];
 
