@@ -13,6 +13,9 @@
     "sinon": "*",
     "fibers": "*"
   }
+  "repository": {
+    "type": "git",
+    "url": "http://github.com/tempodb/tempodb-node-js.git"
+  }
 }
-
 
