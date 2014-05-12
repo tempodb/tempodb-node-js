@@ -9,11 +9,11 @@ var count = 0
 
 var start_time = new Date();
 tempodb.getSeries(key, function(err, result){
-	if (err) {
-		console.log(err);
-		console.log('Status code: ' + err.status);
-		console.log('Error: ' + err.json);
-	} else {
-		console.log(result.json)
-	}
+    if (err) {
+        console.log(err);
+        console.log('Status code: ' + err.status);
+        console.log('Error: ' + err.json);
+    } else {
+        console.log(result.json)
+    }
 });
