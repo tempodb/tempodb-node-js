@@ -372,7 +372,7 @@ You can also retrieve raw data by specifying "raw" as the interval. The series t
 
 ### Returns
 
-An object containing the series information, time series data, and a summary of statistics for the specified time period.
+An object containing the series information and the time series data for the specified time period.
 
         {
             series: {
@@ -514,7 +514,7 @@ You can also retrieve raw data by specifying "raw" as the interval. The series t
 
 ### Returns
 
-An object containing the series information, the accumulated time series data for each point of each series (any series not having data at a particular timestamp will be omitted from that timestamp), and a summary of statistics for the specified time period.
+An object containing the series information, and the accumulated time series data for each point of each series. Any series not having data at a particular timestamp will be omitted from that timestamp.
 
   {
 		"data":[                                                                
@@ -582,7 +582,7 @@ series composed of data from a larger set of series.
 
 ### Returns
 
-An object containing the series information, the accumulated time series data for each point of each series (any series not having data at a particular timestamp will be omitted from that timestamp), and a summary of statistics for the specified time period.
+An object containing the series information, and the accumulated time series data for each point of each series.
 
   {
 		"data":[                                                                
@@ -662,7 +662,7 @@ You can also retrieve raw data by specifying "raw" as the interval. The series t
 
 ### Returns
 
-An object containing the series information, the accumulated time series data for each point of each series (any series not having data at a particular timestamp will be omitted from that timestamp), and a summary of statistics for the specified time period.
+An object containing the series information, and the accumulated time series data for each point of each series.
 
   {
 		"data":[                                                                
