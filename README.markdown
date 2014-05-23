@@ -5,7 +5,7 @@ The TempoDB Node.js API Client makes calls to the [TempoDB API](http://tempo-db.
 1. Install tempodb
 
 ```
-For now, the v1.0 release of the NodeJS TempoDB client must be obtained by cloning the Github repo (https://github.com/tempodb/tempodb-node-js) and installing locally.  Use the v1.0 branch when building.
+npm install tempodb
 ```
 
 1. Edit *your-database-id*, *your-api-key* and *your-api-secret* in tempodb-write-demo.js.
