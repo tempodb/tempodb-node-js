@@ -8,8 +8,9 @@ var series_start_date = new Date('2012-01-01'),
 
 // read a date range
 var options = {
-	'interval': 'raw',
-	key: ['stuff', 'stuff2']
+	'rollup.fold': 'max',
+  'rollup.period': '10min',
+	key: [ 'foo', 'bar']
 }
 var count = 0
 
@@ -20,7 +21,6 @@ tempodb.readMulti(series_start_date, series_end_date, options, function(err, res
 		console.log('Status code: ' + err.status);
 		console.log('Error: ' + err.json);
 	} else {
-    console.log(result.json)
 		result.json.data.toArray(function(err, dps) {
 			if (err) { 
 				console.log('There was an error')
