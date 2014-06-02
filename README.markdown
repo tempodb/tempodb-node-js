@@ -5,7 +5,7 @@ The TempoDB Node.js API Client makes calls to the [TempoDB API](http://tempo-db.
 1. Install tempodb
 
 ```
-For now, the v1.0 release of the NodeJS TempoDB client must be obtained by cloning the Github repo (https://github.com/tempodb/tempodb-node-js) and installing locally.  Use the v1.0 branch when building.
+npm install tempodb
 ```
 
 1. Edit *your-database-id*, *your-api-key* and *your-api-secret* in tempodb-write-demo.js.
@@ -53,8 +53,8 @@ For now, the database ID and API key are the same value.  You can specify an opt
 
 For backwards compatibility purposes, each method has both an _ separated and camelCase naming style:
 
-	Client.write_multi
-	Client.writeMulti
+    Client.write_multi
+    Client.writeMulti
 
 These can be used interchangeably, even though the documentation below reflects the camelCase style.
 
@@ -62,13 +62,13 @@ These can be used interchangeably, even though the documentation below reflects 
 Most of the API functions allow you to pass in an optional *callback* function.  In general, the callback should be a function accepting
 two arguments:
 
-		tempodb.read('foo', function(err, resp) {
-			if (err) {
-				(...)
-			} else {
-				(...)
-			}
-		}
+    tempodb.read('foo', function(err, resp) {
+        if (err) {
+            (...)
+        } else {
+            (...)
+        }
+    }
 
 The error parameter's type will depend on what function you are working with, but typically it will be a Response object as described below.  If an error is encountered before the client can make it all the way to an HTTP response from the REST API, then it will be a standard node.js error instead.
 
@@ -86,10 +86,10 @@ The return types below show what is returned in the *body* parameter of successf
 
 Some endpoints (all those that return multiple values - read, readMulti, listSeries, and findByKey as of this release) return Cursors (defined in *lib/cursor.js*) as the 'data' attribute in the json of the response.  Cursors represent paginated data, but can be used as if they represented all the data in the return call.  To work with the cursor, you can do this:
 
-		Client.read('foo', function(err, resp) {
-			var cursor = resp.json['data'];
-			(...)
-		}
+    Client.read('foo', function(err, resp) {
+        var cursor = resp.json['data'];
+        (...)
+    }
 
 There are two main abstractions for working with cursors: readAll and map:
 
@@ -99,14 +99,14 @@ Read the data page by page, calling the given callback for each *page* of data. 
 ### Cursor.map(*callback*, *finalCallback*)
 Map will call the first callback with each *point* of data until it reaches the end of the cursor.  Anything your callback function returns will be collected into a list that will then be passed to finalCallback.  For example:
 
-	Cursor.map(function(err, datapoint) {
-		datapoint.v += 2.0;
-		return datapoint
-	}, function(err, datapoints) {
-		for (d in datapoints) {
-			console.log(d);
-		}
-	});
+    Cursor.map(function(err, datapoint) {
+        datapoint.v += 2.0;
+        return datapoint
+    }, function(err, datapoints) {
+        for (d in datapoints) {
+            console.log(d);
+        }
+    });
 
 In this case, the final output of this call will be printing each datapoint to the console with its value incremented by 2.0.  You can use map when you need to run a final function that sees the total output of your read call.
 
@@ -237,12 +237,12 @@ The following example returns all series with tags "tag1" and "tag2" and attribu
         if (result.status == 200) {
             var series_list = result.json['data'];
 
-						series_list.readAll(function(err, seriesPage) {
-            	for (var i = 0; i < seriesPage.length; i++) {
-             	   var series = series_list[i];
-             	   console.log(series.id, series.key);
-            	}
-						}
+            series_list.readAll(function(err, seriesPage) {
+                for (var i = 0; i < seriesPage.length; i++) {
+                    var series = series_list[i];
+                    console.log(series.id, series.key);
+                }
+            }
         }
     });
 
@@ -330,11 +330,7 @@ The following example deletes all series with "tag1" and "tag2" and attribute "a
     tempodb.deleteSeries(options, cb);
 
 ## TempoDBClient#read(*series_key*, *start*, *end*, *options*, *callback*) *CURSORED ENDPOINT*
-Gets one series and corresponding time series data between the specified start and end dates.  The optional interval parameter allows you to specify a rollup period. For example, "1hour" will roll the data up on the hour using the provided function. The function parameter specifies the folding function to use while rolling the data up. A rollup is selected automatically if no interval or function is given. The auto rollup interval is calculated by the total time range (end - start) as follows:
-
-* range <= 2 days - raw data is returned
-* range <= 30 days - data is rolled up on the hour
-* else - data is rolled up by the day
+Gets one series and corresponding time series data between the specified start and end dates.  The optional interval parameter allows you to specify a rollup period. For example, "1hour" will roll the data up on the hour using the provided function. The function parameter specifies the folding function to use while rolling the data up. If no rollup parameters are supplied, raw data will be returned.
 
 Rollup intervals are specified by a number and a time period. For example, 1day or 5min. Supported time periods:
 
@@ -369,36 +365,36 @@ You can also retrieve raw data by specifying "raw" as the interval. The series t
     * rollup.fold - the rollup folding function (string)
     * tag - an array of tags to filter on. These tags are and'd together (array of strings)
     * attr - an object of attribute key/value pairs to filter on. These attributes are and'd together. (object)
-		* limit - how many datapoints to read in a single page (Integer)
+    * limit - how many datapoints to read in a single page (Integer)
     * tz - desired output timezone (string).  [View valid timezones](http://tempo-db.com/docs/api/timezone/).
 
 
 
 ### Returns
 
-An object containing the series information, time series data, and a summary of statistics for the specified time period.
+An object containing the series information and the time series data for the specified time period.
 
-        {
-            series: {
-                id: '6fefeba655504694b21235acf8cdae5f',
-                key: 'your-custom-key',
-                name: '',
-                attributes: {},
-                tags: []
-            },
-            data: [
-                { t: '2012-01-01T00:00:00.000+0000', v: 23.559637793913357 },
-                { t: '2012-01-01T01:00:00.000+0000', v: 24.887018265425514 },
-                { t: '2012-01-01T02:00:00.000+0000', v: 24.103298434838965 },
-                ...
-                { t: '2012-01-01T23:00:00.000+0000', v: 23.1820437503413 }
-            ],
-            rollup: {
-                interval: 1hour,
-                'function': 'mean',
-                'tz': 'America/Chicago'
-            }
-         }
+    {
+        series: {
+            id: '6fefeba655504694b21235acf8cdae5f',
+            key: 'your-custom-key',
+            name: '',
+            attributes: {},
+            tags: []
+        },
+        data: [
+            { t: '2012-01-01T00:00:00.000+0000', v: 23.559637793913357 },
+            { t: '2012-01-01T01:00:00.000+0000', v: 24.887018265425514 },
+            { t: '2012-01-01T02:00:00.000+0000', v: 24.103298434838965 },
+            ...
+            { t: '2012-01-01T23:00:00.000+0000', v: 23.1820437503413 }
+        ],
+        rollup: {
+            interval: 1hour,
+            'function': 'mean',
+            'tz': 'America/Chicago'
+        }
+     }
 
 ### Example
 
@@ -419,13 +415,13 @@ The following example reads the list of series with key *your-custom-key* (shoul
     }
 
     tempodb.read(series_key, series_start_date, series_end_date, options, function(err, result){
-			var cursor = result.json.data;
-			cursor.readAll(function(err, datapoints) {
-        for (var i = 0; i < datapoints.length; i++) {
-            var dp = datapoints[i];
-            console.log(dp);
+        var cursor = result.json.data;
+        cursor.readAll(function(err, datapoints) {
+            for (var i = 0; i < datapoints.length; i++) {
+                var dp = datapoints[i];
+                console.log(dp);
+            }
         }
-			}
     });
 
 ## TempoDBClient#getSummary(*series_key*, *start*, *end*, *callback*)
@@ -435,25 +431,25 @@ Gets a summary a data for the given series over the desired time period.
 
 An object containing the series information, time series data, and a summary of statistics for the specified time period.
 
-        {
-            series: {
-                id: '6fefeba655504694b21235acf8cdae5f',
-                key: 'your-custom-key',
-                name: '',
-                attributes: {},
-                tags: []
-            },
-              tz: 'UTC',
-              end: '2012-01-02T00:00:00.000Z',
-              start: '2012-01-01T00:00:00.000Z',
-              summary: 
-                { count: 1440,
-                  mean: 24.78802922652297,
-                  min: 0.03275709459558129,
-                  max: 49.95655614184216,
-                  stddev: 14.361505725497977,
-                  sum: 35694.76208619308 } 
-         }
+    {
+        series: {
+            id: '6fefeba655504694b21235acf8cdae5f',
+            key: 'your-custom-key',
+            name: '',
+            attributes: {},
+            tags: []
+        },
+          tz: 'UTC',
+          end: '2012-01-02T00:00:00.000Z',
+          start: '2012-01-01T00:00:00.000Z',
+          summary: 
+            { count: 1440,
+              mean: 24.78802922652297,
+              min: 0.03275709459558129,
+              max: 49.95655614184216,
+              stddev: 14.361505725497977,
+              sum: 35694.76208619308 } 
+     }
 
 ### Example
 
@@ -476,12 +472,8 @@ The following example gets the summary for one day of the series 'your-custom-ke
       console.log(result.json);
     });
 
-## TempoDBClient#readMulti(*series_key*, *start*, *end*, *options*, *callback*) *CURSORED ENDPOINT*
-Gets multiple series and corresponding time series data between the specified start and end dates.  The optional interval parameter allows you to specify a rollup period. For example, "1hour" will roll the data up on the hour using the provided function. The function parameter specifies the folding function to use while rolling the data up. A rollup is selected automatically if no interval or function is given. The auto rollup interval is calculated by the total time range (end - start) as follows:
-
-* range <= 2 days - raw data is returned
-* range <= 30 days - data is rolled up on the hour
-* else - data is rolled up by the day
+## TempoDBClient#readMulti(*start*, *end*, *options*, *callback*) *CURSORED ENDPOINT*
+Gets multiple series and corresponding time series data between the specified start and end dates.  The optional interval parameter allows you to specify a rollup period. For example, "1hour" will roll the data up on the hour using the provided function. The function parameter specifies the folding function to use while rolling the data up. If no rollup parameters are provided, raw data will be returned.
 
 Rollup intervals are specified by a number and a time period. For example, 1day or 5min. Supported time periods:
 
@@ -517,26 +509,26 @@ You can also retrieve raw data by specifying "raw" as the interval. The series t
         * can also pass single string if only one key
     * tag - an array of tags to filter on. These tags are and'd together (array of strings)
     * attr - an object of attribute key/value pairs to filter on. These attributes are and'd together. (object)
-		* limit - how many datapoints to read in a single page (Integer)
+    * limit - how many datapoints to read in a single page (Integer)
     * tz - desired output timezone (string).  [View valid timezones](http://tempo-db.com/docs/api/timezone/).
 
 ### Returns
 
-An object containing the series information, the accumulated time series data for each point of each series (any series not having data at a particular timestamp will be omitted from that timestamp), and a summary of statistics for the specified time period.
+An object containing the series information, and the accumulated time series data for each point of each series. Any series not having data at a particular timestamp will be omitted from that timestamp.
 
-  {
-		"data":[                                                                
-			{"t":"2012-03-27T03:00:00.000Z","v":{"foo":1.125, "bar":1.341}},                  
-			{"t":"2012-03-28T03:00:00.000Z","v":{"foo":2.125, "bar":3.121}}                   
-			{"t":"2012-03-28T03:00:00.000Z","v":{"bar":3.121}}                   
-		],                                                                      
-		"series":[                                                              
-			{"id":"123efac6b543a2901","key":"foo","name":"","tags":[],"attributes":{}}          
-			{"id":"934cab33e8f1a472b","key":"bar","name":"","tags":[],"attributes":{}}          
-		],                                                                      
-		"rollup":null,                                                          
-		"tz":"UTC"                                                              
-	}
+    {
+        "data":[
+            {"t":"2012-03-27T03:00:00.000Z","v":{"foo":1.125, "bar":1.341}},
+            {"t":"2012-03-28T03:00:00.000Z","v":{"foo":2.125, "bar":3.121}},
+            {"t":"2012-03-28T03:00:00.000Z","v":{"bar":3.121}}
+        ],
+        "series":[
+            {"id":"123efac6b543a2901","key":"foo","name":"","tags":[],"attributes":{}},
+            {"id":"934cab33e8f1a472b","key":"bar","name":"","tags":[],"attributes":{}}
+        ],
+        "rollup":null,
+        "tz":"UTC"
+    }
 
 ### Example
 
@@ -551,20 +543,20 @@ The following example reads the list of series with keys *foo* and *bar* and ret
     series_end_date = new Date('2012-01-02');
 
     var options = {
-			  key: ['foo', 'bar'],
+        key: ['foo', 'bar'],
         'rollup.period': '1hour',
         'rollup.fold': 'mean',
         tz: 'America/Chicago'
     }
 
     tempodb.readMulti(series_start_date, series_end_date, options, function(err, result){
-			var cursor = result.json.data;
-			cursor.readAll(function(err, datapoints) {
-        for (var i = 0; i < datapoints.length; i++) {
-            var dp = datapoints[i];
-            console.log(dp);
+        var cursor = result.json.data;
+        cursor.readAll(function(err, datapoints) {
+            for (var i = 0; i < datapoints.length; i++) {
+                var dp = datapoints[i];
+                console.log(dp);
+            }
         }
-			}
     });
 
 
@@ -585,22 +577,22 @@ series composed of data from a larger set of series.
         * can also pass single string if only one key
     * tag - an array of tags to filter on. These tags are and'd together (array of strings)
     * attr - an object of attribute key/value pairs to filter on. These attributes are and'd together. (object)
-		* limit - how many datapoints to read in a single page (Integer)
+    * limit - how many datapoints to read in a single page (Integer)
     * tz - desired output timezone (string).  [View valid timezones](http://tempo-db.com/docs/api/timezone/).
 
 ### Returns
 
-An object containing the series information, the accumulated time series data for each point of each series (any series not having data at a particular timestamp will be omitted from that timestamp), and a summary of statistics for the specified time period.
+An object containing the series information, and the accumulated time series data for each point of each series.
 
-  {
-		"data":[                                                                
-			{"t":"2012-03-27T03:00:00.000Z","v":1.341},                  
-			{"t":"2012-03-28T03:00:00.000Z","v":3.121},                
-			{"t":"2012-03-29T03:00:00.000Z","v":5.21}                  
-		],                                                                      
-		"rollup":null,                                                          
-		"tz":"UTC"                                                              
-	}
+    {
+        "data": [
+            {"t":"2012-03-27T03:00:00.000Z","v":1.341},
+            {"t":"2012-03-28T03:00:00.000Z","v":3.121},
+            {"t":"2012-03-29T03:00:00.000Z","v":5.21}
+        ],
+        "rollup":null,
+        "tz":"UTC"
+    }
 
 ### Example
 
@@ -615,18 +607,18 @@ The following example reads the list of series with keys *foo* and *bar* and ret
     series_end_date = new Date('2012-01-02');
 
     var options = {
-			  key: ['foo', 'bar'],
+        key: ['foo', 'bar'],
         tz: 'America/Chicago'
     }
 
     tempodb.aggregate(series_start_date, series_end_date, "sum", options, function(err, result){
-			var cursor = result.json.data;
-			cursor.readAll(function(err, datapoints) {
-        for (var i = 0; i < datapoints.length; i++) {
-            var dp = datapoints[i];
-            console.log(dp);
+        var cursor = result.json.data;
+        cursor.readAll(function(err, datapoints) {
+            for (var i = 0; i < datapoints.length; i++) {
+                var dp = datapoints[i];
+                console.log(dp);
+            }
         }
-			}
     });
 ## TempoDBClient#getMultiRollups(*series_key*, *start*, *end*, *options*, *callback*) *CURSORED ENDPOINT*
 Apply multiple rollup functions to a single series read.  The rollup functions used will all use the same period.
@@ -665,26 +657,26 @@ You can also retrieve raw data by specifying "raw" as the interval. The series t
         * can also pass single string if only one key
     * tag - an array of tags to filter on. These tags are and'd together (array of strings)
     * attr - an object of attribute key/value pairs to filter on. These attributes are and'd together. (object)
-		* limit - how many datapoints to read in a single page (Integer)
+        * limit - how many datapoints to read in a single page (Integer)
     * tz - desired output timezone (string).  [View valid timezones](http://tempo-db.com/docs/api/timezone/).
 
 ### Returns
 
-An object containing the series information, the accumulated time series data for each point of each series (any series not having data at a particular timestamp will be omitted from that timestamp), and a summary of statistics for the specified time period.
+An object containing the series information, and the accumulated time series data for each point of each series.
 
-  {
-		"data":[                                                                
-      { t: '2012-01-01T04:00:00.000Z', v: { count: 60, max: 49.84126889814867, min: 1.1116998714582937, percentile: 8.407472817470296 } },
-      { t: '2012-01-01T05:00:00.000Z', v: { count: 60, max: 49.84126889814867, min: 1.1116998714582937, percentile: 8.407472817470296 } },
-      ...
-		],                                                                      
-		"series":[                                                              
-			{"id":"934cab33e8f1a472b","key":"bar","name":"","tags":[],"attributes":{}}          
-		],                                                                      
-		"rollup": { period: 'PT1H',
-        folds: [ 'count', 'max', 'min', 'percentile(0.2)' ] },
-		"tz":"UTC"                                                              
-	}
+    {
+        "data":[
+            { t: '2012-01-01T04:00:00.000Z', v: { count: 60, max: 49.84126889814867, min: 1.1116998714582937, percentile: 8.407472817470296 } },
+            { t: '2012-01-01T05:00:00.000Z', v: { count: 60, max: 49.84126889814867, min: 1.1116998714582937, percentile: 8.407472817470296 } },
+            ...
+        ],
+        "series":[
+            {"id":"934cab33e8f1a472b","key":"bar","name":"","tags":[],"attributes":{}}
+        ],
+        "rollup": { period: 'PT1H',
+            folds: [ 'count', 'max', 'min', 'percentile(0.2)' ] },
+        "tz":"UTC"
+    }
 
 ### Example
 
@@ -694,34 +686,34 @@ The following example reads the list of series with keys *foo* and *bar* and ret
     var tempodb = new TempoDBClient('my-key, 'my-secret')
 
     var series_key = 'stuff',
-	    series_start_date = new Date('2012-01-01'),
-	    series_end_date = new Date('2012-01-02');
+        series_start_date = new Date('2012-01-01'),
+        series_end_date = new Date('2012-01-02');
 
     // read a date range
     var options = {
-	    'rollup.period': '1hour',
-      'rollup.fold': ['count', 'max', 'min', 'percentile,20'],
-	    limit: 1000
-   }
-  var count = 0
+        'rollup.period': '1hour',
+        'rollup.fold': ['count', 'max', 'min', 'percentile,20'],
+        limit: 1000
+    }
+    var count = 0
 
-var start_time = new Date();
-tempodb.getMultiRollups(series_key, series_start_date, series_end_date, options, function(err, result){
-	    if (err) {
-		    console.log(err);
-		    console.log('Status code: ' + err.status);
-		    console.log('Error: ' + err.json);
-	    } else {
-        console.log(result.json)
-		    result.json.data.toArray(function(err, dps) {
-			    if (err) { 
-				    console.log('There was an error')
-			    } else {
-            console.log(dps);
-				    console.log('Total points: ' + dps.length);
-			    }
-		    });
-    	}
+    var start_time = new Date();
+    tempodb.getMultiRollups(series_key, series_start_date, series_end_date, options, function(err, result){
+        if (err) {
+            console.log(err);
+            console.log('Status code: ' + err.status);
+            console.log('Error: ' + err.json);
+        } else {
+            console.log(result.json)
+            result.json.data.toArray(function(err, dps) {
+                if (err) { 
+                    console.log('There was an error')
+                } else {
+                    console.log(dps);
+                    console.log('Total points: ' + dps.length);
+                }
+            });
+        }
     });
 
 
@@ -743,42 +735,42 @@ The find period can be any valid ISO period.
 * options is an object containing any of the following
     * predicate.period - the period to search within (string)
     * predicate.function - the finding function (string)
-		* limit - how many datapoints to read in a single page (Integer)
+        * limit - how many datapoints to read in a single page (Integer)
     * tz - desired output timezone (string).  [View valid timezones](http://tempo-db.com/docs/api/timezone/).
 
 ### Returns
 
 An object containing the information on the located datapoints, 
 
-  {
-		"data":[                                                                
-      {
-        "interval": {
-          "start": "2012-03-27T00:00:00.000Z",
-          "end": "2012-03-28T00:00:00.000Z"
+    {
+        "data":[
+            {
+                "interval": {
+                    "start": "2012-03-27T00:00:00.000Z",
+                    "end": "2012-03-28T00:00:00.000Z"
+                },
+                "found": {
+                    "t": "2012-03-27T04:14:22.000Z",
+                    "v": 2.3
+                }
+            },
+            {
+                "interval": {
+                    "start": "2012-03-28T00:00:00.000Z",
+                    "end": "2012-03-29T00:00:00.000Z"
+                },
+                "found": {
+                    "t": "2012-03-28T015:02:59.000Z",
+                    "v": 8.1
+                }
+            }
+        ],
+        "predicate": {
+            "function": "max",
+            "period": "PT1H"
         },
-        "found": {
-          "t": "2012-03-27T04:14:22.000Z",
-          "v": 2.3
-        }
-      },
-      {
-        "interval": {
-          "start": "2012-03-28T00:00:00.000Z",
-          "end": "2012-03-29T00:00:00.000Z"
-        },
-        "found": {
-          "t": "2012-03-28T015:02:59.000Z",
-          "v": 8.1
-        }
-      }
-		],                                                                      
-		"predicate": {
-      "function": "max",
-      "period": "PT1H"
-    },                                                          
-		"tz":"UTC"                                                              
-	}
+        "tz":"UTC"
+    }
 
 ### Example
 
@@ -794,7 +786,7 @@ The following example finds the maximum datapoint within each hour for a day.
     series_end_date = new Date('2012-01-02');
 
     var options = {
-			  key: ['foo', 'bar'],
+        key: ['foo', 'bar'],
         interval: '1hour',
         'predicate.function': 'max',
         'predicate.period': '1hour',
@@ -802,13 +794,13 @@ The following example finds the maximum datapoint within each hour for a day.
     }
 
     tempodb.findByKey(series_key, series_start_date, series_end_date, options, function(err, result){
-			var cursor = result.json.data;
-			cursor.readAll(function(err, datapoints) {
-        for (var i = 0; i < datapoints.length; i++) {
-            var dp = datapoints[i];
-            console.log(dp);
+        var cursor = result.json.data;
+        cursor.readAll(function(err, datapoints) {
+            for (var i = 0; i < datapoints.length; i++) {
+                var dp = datapoints[i];
+                console.log(dp);
+            }
         }
-			}
     });
 
 ## TempoDBClient#singleValueByKey(*series_key*, *ts*, *options*, *callback*)
