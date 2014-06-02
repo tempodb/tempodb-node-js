@@ -16,22 +16,6 @@ var count = 0
 
 var start_time = new Date();
 tempodb.readMulti(series_start_date, series_end_date, options, function(err, result){
-<<<<<<< HEAD
-	if (err) {
-		console.log(err);
-		console.log('Status code: ' + err.status);
-		console.log('Error: ' + err.json);
-	} else {
-		result.json.data.toArray(function(err, dps) {
-			if (err) { 
-				console.log('There was an error')
-			} else {
-				console.log(dps)
-				console.log('Total points: ' + dps.length);
-			}
-		});
-	}
-=======
     if (err) {
         console.log(err);
         console.log('Status code: ' + err.status);
@@ -47,5 +31,4 @@ tempodb.readMulti(series_start_date, series_end_date, options, function(err, res
             }
         });
     }
->>>>>>> e26bfd514e9ba622b1a9ba1aa2779e3eb1ba9e6f
 });
