@@ -8,9 +8,9 @@ var series_start_date = new Date('2012-01-01'),
 
 // read a date range
 var options = {
-	'rollup.fold': 'max',
-  'rollup.period': '10min',
-	key: [ 'foo', 'bar']
+    'rollup.fold': 'max',
+    'rollup.period': '10min',
+    key: [ 'foo', 'bar']
 }
 var count = 0
 
